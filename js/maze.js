@@ -11,7 +11,7 @@ var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
 var mouseIsCaptured = false;
-var MAX_COLS = 3;
+var MAX_COLS = 2;
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var lineInterval = 0;
 var boardPos = null;
@@ -56,7 +56,7 @@ function generatePath(){
 	path.push(currentRoom);
 	var counter = 0;
 	console.log("In generatePath()...");
-	while (currentRoom.location != MAX_COLS && counter < 36 ){
+	while (currentRoom.location != GRID_SIZE  ){
 		// determine which way to exit from possible exits (doors)
 		var doorIndex = getExitDoor(currentRoom.doors);
 		// doorIndex  0 = n (subtract 1 from row)
@@ -76,12 +76,12 @@ function generatePath(){
 				break;
 			}
 			case 2 : {
-				currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
+				currentRoom = allRooms[(currentRoom.location -1) + 1];
 				path.push(currentRoom);
 				break;
 			}
 			case 3 : {
-				currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
+				currentRoom = allRooms[(currentRoom.location -1) - 1];
 				path.push(currentRoom);
 				break;
 			}
