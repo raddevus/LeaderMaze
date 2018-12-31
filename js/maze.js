@@ -47,6 +47,16 @@ var allRooms = [];
 initApp();
 initializeRooms();
 generatePath();
+
+function drawPath(){
+	ctx.fillStyle = "yellow";
+	ctx.beginPath();
+	for(x = 0; x < path.length -1; x++){
+		ctx.moveTo(path[x].textLocationX,path[x].textLocationY);
+		ctx.lineTo(path[x+1].textLocationX,path[x+1].textLocationY);
+		ctx.stroke(); 
+	}
+}
 function generatePath(){
 	
 	// we always push room 1 on first since that is always where we start.
@@ -352,6 +362,9 @@ function draw() {
 				DrawDirections(allRooms[i-1]);
 			}
 		}
+	}
+	if (path.length > 0){
+		drawPath();
 	}
 }
 
