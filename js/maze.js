@@ -61,7 +61,7 @@ function generatePath(){
 	// Requirement is that the path cannot return to a room it just visited
 	// if you entered from the w you are not allowed to leave e
 	
-	while (currentRoom.location != GRID_SIZE  ){
+	while (currentRoom.location != GRID_SIZE && counter < 100 ){
 		// determine which way to exit from possible exits (doors)
 		var doorIndex = getExitDoor(currentRoom.doors);
 		// doorIndex  0 = n (subtract 1 from row)
@@ -70,32 +70,38 @@ function generatePath(){
 		// 3 = w (subtract one from column)
 		switch (doorIndex){
 			case 0 : {
-				
 				currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
-				currentRoom.visited = true;
-				path.push(currentRoom);
+				if (currentRoom.visited){
+					continue;
+				}
 				break;
 			}
 			case 1 : {
 				currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
-				currentRoom.visited = true;
-				path.push(currentRoom);
+				if (currentRoom.visited){
+					continue;
+				}
 				break;
 			}
 			case 2 : {
 				currentRoom = allRooms[(currentRoom.location -1) + 1];
-				currentRoom.visited = true;
-				path.push(currentRoom);
+				if (currentRoom.visited){
+					continue;
+				}
 				break;
 			}
 			case 3 : {
 				currentRoom = allRooms[(currentRoom.location -1) - 1];
-				currentRoom.visited = true;
-				path.push(currentRoom);
+				if (currentRoom.visited){
+					continue;
+				}
 				break;
 			}
 		}
+		currentRoom.visited = true;
+		path.push(currentRoom);
 		counter++;
+
 	}
 }
 
