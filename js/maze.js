@@ -11,7 +11,7 @@ var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
 var mouseIsCaptured = false;
-var MAX_COLS = 2;
+var MAX_COLS = 6;
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var lineInterval = 0;
 var boardPos = null;
@@ -50,12 +50,17 @@ generatePath();
 function generatePath(){
 	
 	// we always push room 1 on first since that is always where we start.
-	allRooms.visited = true;
+	
 	var roomIndex = 0;
 	var currentRoom = allRooms[roomIndex];
+	currentRoom.visited = true;
 	path.push(currentRoom);
 	var counter = 0;
 	console.log("In generatePath()...");
+	
+	// Requirement is that the path cannot return to a room it just visited
+	// if you entered from the w you are not allowed to leave e
+	
 	while (currentRoom.location != GRID_SIZE  ){
 		// determine which way to exit from possible exits (doors)
 		var doorIndex = getExitDoor(currentRoom.doors);
@@ -67,21 +72,25 @@ function generatePath(){
 			case 0 : {
 				
 				currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
+				currentRoom.visited = true;
 				path.push(currentRoom);
 				break;
 			}
 			case 1 : {
 				currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
+				currentRoom.visited = true;
 				path.push(currentRoom);
 				break;
 			}
 			case 2 : {
 				currentRoom = allRooms[(currentRoom.location -1) + 1];
+				currentRoom.visited = true;
 				path.push(currentRoom);
 				break;
 			}
 			case 3 : {
 				currentRoom = allRooms[(currentRoom.location -1) - 1];
+				currentRoom.visited = true;
 				path.push(currentRoom);
 				break;
 			}
@@ -209,21 +218,6 @@ function room(roomInfo){
 				this.doors[e] = 1;
 			}
 		}
-		
-/*		if (this.location == MAX_COLS*2){
-			// northmost-eastmost cannot have east movement
-			this.doors[s] = 1;
-			this.doors[w] = 1;
-		}
-
-		if ((this.location % MAX_COLS) == 1){
-			this.doors[s] = 1;
-		}
-		
-		if ((this.location % MAX_COLS) == 2){
-			this.doors[s] = 1;
-		}
-	*/	
 	}
 	// locations 1 - 6 cannot have up as a direction
 	// locations 1,7,13,19,25,31 cannot have west as a direction
@@ -254,15 +248,6 @@ function getPossibleDirections(doors){
 		possibleDirections += "w";
 	}
 	return possibleDirections;
-}
-
-function direction(constraint){
-	// randomly pick a direction and return it
-	// consider the constraints passed in
-	var north = 1; 
-	var south = 2;
-	var east = 4;
-	var west = 8;
 }
 
 function initApp()
