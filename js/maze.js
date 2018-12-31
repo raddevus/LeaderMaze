@@ -63,6 +63,7 @@ function generatePath(){
 	
 	while (currentRoom.location != GRID_SIZE && counter < 100 ){
 		// determine which way to exit from possible exits (doors)
+		counter++;
 		var doorIndex = getExitDoor(currentRoom.doors);
 		// doorIndex  0 = n (subtract 1 from row)
 		// 1 = s (add one to row)
@@ -70,29 +71,37 @@ function generatePath(){
 		// 3 = w (subtract one from column)
 		switch (doorIndex){
 			case 0 : {
-				currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
-				if (currentRoom.visited){
+				if (!allRooms[(currentRoom.location -1) - MAX_COLS].visited){
+					currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
+				}
+				else{
 					continue;
 				}
 				break;
 			}
 			case 1 : {
-				currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
-				if (currentRoom.visited){
+				if (!allRooms[(currentRoom.location -1) + MAX_COLS].visited){
+					currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
+				}
+				else{
 					continue;
 				}
 				break;
 			}
 			case 2 : {
-				currentRoom = allRooms[(currentRoom.location -1) + 1];
-				if (currentRoom.visited){
+				if (!allRooms[(currentRoom.location -1) + 1].visited){
+					currentRoom = allRooms[(currentRoom.location -1) + 1];
+				}
+				else{
 					continue;
 				}
 				break;
 			}
 			case 3 : {
-				currentRoom = allRooms[(currentRoom.location -1) - 1];
-				if (currentRoom.visited){
+				if (!allRooms[(currentRoom.location -1) - 1].visited){
+					currentRoom = allRooms[(currentRoom.location -1) - 1];
+				}
+				else{
 					continue;
 				}
 				break;
@@ -100,8 +109,6 @@ function generatePath(){
 		}
 		currentRoom.visited = true;
 		path.push(currentRoom);
-		counter++;
-
 	}
 }
 
