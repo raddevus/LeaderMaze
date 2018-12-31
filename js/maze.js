@@ -5,12 +5,13 @@ var n = 0;
 var s = 1;
 var e = 2;
 var w = 3;
-
+// path is an array of rooms used by generatePath()
+	var path = [];
 var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
 var mouseIsCaptured = false;
-var MAX_COLS = 6;
+var MAX_COLS = 3;
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var lineInterval = 0;
 var boardPos = null;
@@ -45,6 +46,62 @@ function initRows(){
 var allRooms = [];
 initApp();
 initializeRooms();
+generatePath();
+function generatePath(){
+	
+	// we always push room 1 on first since that is always where we start.
+	allRooms.visited = true;
+	var roomIndex = 0;
+	var currentRoom = allRooms[roomIndex];
+	path.push(currentRoom);
+	var counter = 0;
+	console.log("In generatePath()...");
+	while (currentRoom.location != MAX_COLS && counter < 36 ){
+		// determine which way to exit from possible exits (doors)
+		var doorIndex = getExitDoor(currentRoom.doors);
+		// doorIndex  0 = n (subtract 1 from row)
+		// 1 = s (add one to row)
+		// 2 = e (add one to column)
+		// 3 = w (subtract one from column)
+		switch (doorIndex){
+			case 0 : {
+				
+				currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
+				path.push(currentRoom);
+				break;
+			}
+			case 1 : {
+				currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
+				path.push(currentRoom);
+				break;
+			}
+			case 2 : {
+				currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
+				path.push(currentRoom);
+				break;
+			}
+			case 3 : {
+				currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
+				path.push(currentRoom);
+				break;
+			}
+		}
+		counter++;
+	}
+}
+
+function getExitDoor(doors){
+	// returns the index of the original doors array 
+	var possibleDoors = [];
+	for (x = 0;x<doors.length;x++){
+		if (doors[x] == 1){
+			// this is an array of the door indexes
+			possibleDoors.push(x);
+		}
+	}
+	var chosenDoorIndex = Math.floor((Math.random() * possibleDoors.length))
+	return possibleDoors[chosenDoorIndex];
+}
 
 function initializeRooms(){
 	initCols();
