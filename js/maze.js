@@ -11,7 +11,7 @@ var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
 var mouseIsCaptured = false;
-var MAX_COLS = 6;
+var MAX_COLS = 8;
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var lineInterval = 0;
 var boardPos = null;
@@ -19,14 +19,6 @@ var boardPos = null;
 function boardLoc (loc){
 	this.x = loc.x;
 	this.y = loc.y;
-}
-
-function token(userToken){
-	this.name = userToken.name,
-	this.x = userToken.x;
-	this.y = userToken.y;
-	this.width = userToken.width;
-	this.height = userToken.height;
 }
 
 var cols = [];
@@ -49,12 +41,13 @@ initializeRooms();
 generatePath();
 
 function drawPath(){
-	ctx.fillStyle = "yellow";
+	ctx.strokeStyle = "darkorange";
+	ctx.lineWidth = 2;
 	ctx.beginPath();
 	for(x = 0; x < path.length -1; x++){
 		ctx.moveTo(path[x].textLocationX,path[x].textLocationY);
 		ctx.lineTo(path[x+1].textLocationX,path[x+1].textLocationY);
-		ctx.stroke(); 
+		ctx.stroke();
 	}
 }
 function generatePath(){
@@ -272,11 +265,16 @@ function getPossibleDirections(doors){
 	}
 	return possibleDirections;
 }
-
+function reGenPath(){
+allRooms = [];
+path = [];
+initApp();
+initializeRooms();
+generatePath();
+draw();
+}
 function initApp()
 {
-	window.addEventListener("keydown", moveBackground);
-
 	theCanvas = document.getElementById("gamescreen");
 	ctx = theCanvas.getContext("2d");
 	
