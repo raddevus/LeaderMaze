@@ -8,9 +8,9 @@ var w = 3;
 var ogres = [];
 var traps = [];
 possibleOgresAndTraps = [];
-
+var pathIndexer = 0;
 // path is an array of rooms used by generatePath()
-	var path = [];
+var path = [];
 var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
@@ -44,6 +44,7 @@ var allRooms = [];
 initApp();
 initializeRooms();
 placeOgresAndTraps();
+addOgresAndTrapsToRooms();
 generatePath();
 
 function initPossibles(){
@@ -54,15 +55,24 @@ function initPossibles(){
 	}
 }
 
+// var timerFlag = setInterval(function, milliseconds)
+// clearInterval(timerFlag);
+
+
 function drawPath(){
 	ctx.strokeStyle = "darkorange";
 	ctx.lineWidth = 2;
 	ctx.beginPath();
-	for(x = 0; x < path.length -1; x++){
-		ctx.moveTo(path[x].textLocationX,path[x].textLocationY);
-		ctx.lineTo(path[x+1].textLocationX,path[x+1].textLocationY);
+
+	while(pathIndexer < path.length -1){
+		console.log("pathIndexer : " + pathIndexer);
+		ctx.moveTo(path[pathIndexer].textLocationX,path[pathIndexer].textLocationY);
+		ctx.lineTo(path[pathIndexer+1].textLocationX,path[pathIndexer+1].textLocationY);
 		ctx.stroke();
+		pathIndexer++;
 	}
+	pathIndexer = 0;
+	
 }
 
 function placeOgresAndTraps(){
@@ -125,6 +135,16 @@ function placeOgresAndTraps(){
 	drawTrapsAndOgres();
 }
 
+function addOgresAndTrapsToRooms(){
+	for (o = 0; o < ogres.length; o++){
+		allRooms[ogres[o]-1].hasOgre = true;
+	}
+	for (t = 0; t < traps.length; t++){
+		allRooms[traps[t]-1].hasTrap = true;
+	}
+
+}
+
 function drawTrapsAndOgres(){
 	// DRAW TRAPS
 	ctx.globalAlpha = .5;
@@ -168,7 +188,9 @@ function generatePath(){
 		// 3 = w (subtract one from column)
 		switch (doorIndex){
 			case 0 : {
-				if (!allRooms[(currentRoom.location -1) - MAX_COLS].isPath){
+				if (!allRooms[(currentRoom.location -1) - MAX_COLS].isPath
+				&& !allRooms[(currentRoom.location -1) - MAX_COLS].hasOgre
+				&& !allRooms[(currentRoom.location -1) - MAX_COLS].hasTrap){
 					currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
 				}
 				else{
@@ -177,7 +199,9 @@ function generatePath(){
 				break;
 			}
 			case 1 : {
-				if (!allRooms[(currentRoom.location -1) + MAX_COLS].isPath){
+				if (!allRooms[(currentRoom.location -1) + MAX_COLS].isPath
+				&& !allRooms[(currentRoom.location -1) + MAX_COLS].hasOgre
+				&& !allRooms[(currentRoom.location -1) + MAX_COLS].hasTrap){
 					currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
 				}
 				else{
@@ -186,7 +210,9 @@ function generatePath(){
 				break;
 			}
 			case 2 : {
-				if (!allRooms[(currentRoom.location -1) + 1].isPath){
+				if (!allRooms[(currentRoom.location -1) + 1].isPath
+				&& !allRooms[(currentRoom.location -1) + 1].hasOgre
+				&& !allRooms[(currentRoom.location -1) + 1].hasTrap){
 					currentRoom = allRooms[(currentRoom.location -1) + 1];
 				}
 				else{
@@ -195,7 +221,9 @@ function generatePath(){
 				break;
 			}
 			case 3 : {
-				if (!allRooms[(currentRoom.location -1) - 1].isPath){
+				if (!allRooms[(currentRoom.location -1) - 1].isPath
+				&& !allRooms[(currentRoom.location -1) - 1].hasOgre
+				&& !allRooms[(currentRoom.location -1) - 1].hasTrap){
 					currentRoom = allRooms[(currentRoom.location -1) - 1];
 				}
 				else{
@@ -279,6 +307,8 @@ function room(roomInfo){
 	this.textLocationY = (this.row * (lineInterval )) - (lineInterval /2);
 	this.init = function(){
 		this.isPath = false; // it isn't on path until a path is generated
+		this.hasOgre = false;
+		this.hasTrap = false;
 		// ###### If this is the first row, set up directions
 		if (this.row == 1){
 			this.doors[s] = 1;
@@ -358,6 +388,7 @@ function reGenPath(){
 	initPossibles();
 	initializeRooms();
 	placeOgresAndTraps();
+	addOgresAndTrapsToRooms();
 	generatePath();
 	draw();
 }
