@@ -399,6 +399,15 @@ function reGenPath(){
 	draw();
 }
 
+function reTryPath(){
+	path= [];
+	initPossibles();
+	initializeRooms();
+	addOgresAndTrapsToRooms();
+	generatePath();
+	draw();
+}
+
 function initUnblockedRooms(){
 	unblockedRooms.push(2); // 2 is always one no matter grid size.
 	unblockedRooms.push(MAX_COLS+1); // first room of 2nd row
