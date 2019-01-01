@@ -164,7 +164,7 @@ function drawTrapsAndOgres(){
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
 		ctx.beginPath();	
-		ctx.arc(allRooms[ogres[x]-1].textLocationX,allRooms[ogres[x]-1].textLocationY +15, 7, 0, 2 * Math.PI, false);
+		ctx.arc(allRooms[ogres[x]-1].textLocationX,allRooms[ogres[x]-1].textLocationY +8, 7, 0, 2 * Math.PI, false);
 		ctx.fillStyle = 'green';
 		ctx.fill();
 		ctx.stroke();
@@ -424,7 +424,7 @@ function retryUntilSolved(){
 }
 
 function displayResults(){
-	if (attempts < MAX_ATTEMPTS && currentRoom.location == GRID_SIZE){
+	if (attempts <= MAX_ATTEMPTS && currentRoom.location == GRID_SIZE){
 		alert ("Solved it in " + attempts + " attempts.");
 	}
 	if (attempts >=MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
@@ -497,10 +497,6 @@ function draw() {
 	ctx.canvas.height  = window.innerHeight-5;
 	ctx.canvas.width = ctx.canvas.height;
 	ctx.strokeStyle = '#0000ff';
-	
-	//ctx.lineWidth = 10;
-	
-	//ctx.strokeRect(10,10,ctx.canvas.width-15, ctx.canvas.height-15);
 	
 	ctx.font = '10px sans-serif';
 	
