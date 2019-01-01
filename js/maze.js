@@ -11,7 +11,7 @@ var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
 var mouseIsCaptured = false;
-var MAX_COLS = 8;
+var MAX_COLS = 6;//document.getElementById("colSize").value;
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var lineInterval = 0;
 var boardPos = null;
@@ -142,12 +142,7 @@ function DrawDirections(room){
     
 	ctx.strokeStyle = '#ff000';
 	ctx.globalAlpha = 1;
-	if (room.location == 12 || room.location == 11){
-		console.log ("textLocation : " + room.textLocationX + " : " + room.textLocationY);
-		console.log(room.doors);
-	}
 	if (room.location <=GRID_SIZE){
-		console.log(room.doors);
 		ctx.fillText(getPossibleDirections(room.doors), room.textLocationX,room.textLocationY);
 	}
 }
@@ -170,7 +165,6 @@ function getColumnNumber(location){
 				return location % MAX_COLS == 0 ? location  : location % MAX_COLS;
 			}
 			else{
-				console.log("6*x : " + MAX_COLS*(x-1));
 				return location % MAX_COLS == 0 ? location - (MAX_COLS*(x-1))  : location % MAX_COLS;
 			}
 		}
@@ -203,7 +197,6 @@ function room(roomInfo){
 		}
 		
 		if (this.location % MAX_COLS == 0){
-			console.log("this.location % MAX_COLS : " + this.location);
 			this.doors[w] = 1;
 			if (this.location != GRID_SIZE){
 				this.doors[s] = 1;
@@ -211,7 +204,6 @@ function room(roomInfo){
 			if (this.location != MAX_COLS){
 				this.doors[n] = 1;
 			}
-			console.log(this.doors);
 		}
 
 		if (this.column != 1 && this.column != MAX_COLS){
