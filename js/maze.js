@@ -42,8 +42,9 @@ function initRows(){
 var allRooms = [];
 initApp();
 initializeRooms();
-generatePath();
 placeOgresAndTraps();
+generatePath();
+
 
 function drawPath(){
 	ctx.strokeStyle = "darkorange";
