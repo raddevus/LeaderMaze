@@ -144,9 +144,9 @@ function DrawDirections(room){
     
 	ctx.strokeStyle = '#ff000';
 	ctx.globalAlpha = 1;
-	if (room.location <=GRID_SIZE){
-		ctx.fillText(getPossibleDirections(room.doors), room.textLocationX,room.textLocationY);
-	}
+	ctx.fillText(getPossibleDirections(room.doors), room.textLocationX,room.textLocationY);
+	ctx.fillText(room.location, room.textLocationX, room.textLocationY + 10);
+	
 }
 
 function getRowNumber(location){
