@@ -11,14 +11,16 @@ possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
 var currentRoom = null;
+var MAX_COLS = 6;
 var MAX_ATTEMPTS = 100;
+var MAX_OGRES_TRAPS = 5;
 var attempts = 0;
 // path is an array of rooms used by generatePath()
 var path = [];
 var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
-var MAX_COLS = 6;//document.getElementById("colSize").value;
+
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var lineInterval = 0;
 var boardPos = null;
@@ -89,52 +91,44 @@ function placeOgresAndTraps(){
 	// 2 and 7 (blocks entrance). 
 	// ####################
 
-	while (ogres.length < 5){ 
+	while (ogres.length < MAX_OGRES_TRAPS){ 
 		var possibleOgre = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
 		ogres.push(possibleOgre);
 		if (possibleOgre == unblockedRooms[0] || possibleOgre == unblockedRooms[1]){
 			if (possibleOgre - unblockedRooms[0] == 0){
-				// remove 7 from possibleOgresAndTraps
 				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[1]),1);
 			}
 			else{
-				//otherwise remove the 2
 				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[0]),1);
 			}
 		}
 		if (possibleOgre == unblockedRooms[2] || possibleOgre == unblockedRooms[3]){
 			if (possibleOgre - unblockedRooms[2] == 0){
-				// remove 35 from possibleOgresAndTraps
 				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[3]),1);
 			}
 			else{
-				//otherwise remove the 30
 				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[2]),1);
 			}
 		}
 	}
 
-	while (traps.length < 5){
+	while (traps.length < MAX_OGRES_TRAPS){
 		var possibleTrap = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
 		traps.push(possibleTrap);
-		if (possibleTrap == 2 || possibleTrap == 7){
-			if (possibleTrap - 2 == 0){
-				// remove 7 from possibleOgresAndTraps
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(7),1);
+		if (possibleTrap == unblockedRooms[0] || possibleTrap == unblockedRooms[1]){
+			if (possibleTrap - unblockedRooms[0] == 0){
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[1]),1);
 			}
 			else{
-				//otherwise remove the 2
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(2),1);
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[0]),1);
 			}
 		}
-		if (possibleTrap == 30 || possibleTrap == 35){
-			if (possibleTrap - 30 == 0){
-				// remove 35 from possibleOgresAndTraps
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(35),1);
+		if (possibleTrap == unblockedRooms[2] || possibleTrap == unblockedRooms[3]){
+			if (possibleTrap - unblockedRooms[2] == 0){
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[3]),1);
 			}
 			else{
-				//otherwise remove the 30
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(30),1);
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[2]),1);
 			}
 		}
 	} 
@@ -409,7 +403,7 @@ function reTryPath(){
 }
 
 function retryUntilSolved(){
-	
+	attempts = 0;
 	while (attempts < MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
 		path= [];
 		initPossibles();
@@ -426,7 +420,7 @@ function displayResults(){
 	if (attempts < MAX_ATTEMPTS && currentRoom.location == GRID_SIZE){
 		alert ("Solved it in " + attempts + " attempts.");
 	}
-	if (attempts >=MAX_ATTEMPTS){
+	if (attempts >=MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
 		alert("Most likely, this map is unsolvable.");
 	}
 	
