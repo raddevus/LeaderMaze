@@ -63,6 +63,9 @@ function initPossibles(){
 }
 
 function drawPathSteps(){
+	ctx.strokeStyle = "darkorange";
+	ctx.beginPath();
+	ctx.lineWidth = 2;
 	if (pathIndexer < path.length -1){
 		ctx.moveTo(path[pathIndexer].textLocationX,path[pathIndexer].textLocationY);
 		ctx.lineTo(path[pathIndexer+1].textLocationX,path[pathIndexer+1].textLocationY);
@@ -77,9 +80,6 @@ function drawPathSteps(){
 }
 
 function drawPath(){
-	ctx.strokeStyle = "darkorange";
-	ctx.lineWidth = 2;
-	ctx.beginPath();
 	setTimeout(drawPathSteps, 100);
 }
 
@@ -156,11 +156,18 @@ function drawTrapsAndOgres(){
 	}
 	
 	// DRAW OGRES
+	
 	ctx.fillStyle = "darkgreen";
+	ctx.strokeStyle = '#003300';
+	ctx.lineWidth = 1;
 	for(x = 0; x < ogres.length; x++){
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
-		ctx.fillRect(allRooms[ogres[x]-1].textLocationX,allRooms[ogres[x]-1].textLocationY+5,15,15);
+		ctx.beginPath();	
+		ctx.arc(allRooms[ogres[x]-1].textLocationX,allRooms[ogres[x]-1].textLocationY +15, 7, 0, 2 * Math.PI, false);
+		ctx.fillStyle = 'green';
+		ctx.fill();
+		ctx.stroke();
 	}
 	ctx.globalAlpha = 1;
 }
