@@ -5,6 +5,9 @@ var n = 0;
 var s = 1;
 var e = 2;
 var w = 3;
+var ogres = [];
+var traps = [];
+
 // path is an array of rooms used by generatePath()
 	var path = [];
 var ctx = null;
@@ -50,6 +53,61 @@ function drawPath(){
 		ctx.stroke();
 	}
 }
+
+function placeOgresAndTraps(){
+	ogres = [];
+	traps = [];
+	// rooms 1 and MAX_COLS are off limits for ogres and traps
+	// since they are the start and stop
+	ogres.push(Math.ceil((Math.random() * (GRID_SIZE-2))+1));
+	while (ogres.length < 5){ 
+		var possibleOgre = Math.ceil((Math.random() * (GRID_SIZE-2))+1);
+		var addOgre = true;
+		for (x = 0; x< 5;x++){
+			if (ogres[x] == possibleOgre){addOgre = false;continue;}
+		}
+		if (addOgre){
+			ogres.push(possibleOgre);
+		}
+	}
+	
+	while (traps.length < 5){
+		var possibleTrap = Math.ceil((Math.random() * (GRID_SIZE-2))+1);
+		addTrap = true;
+		for (x = 0; x< 5;x++){
+			if (ogres[x] == possibleTrap){addTrap = false;continue;}
+		}
+		for (x = 0; x<5;x++){
+			if (traps[x] == possibleTrap){addTrap = false;continue;}
+		}
+		if (addTrap){
+			traps.push(possibleTrap);
+		}
+	}
+	
+	// DRAW TRAPS
+	ctx.globalAlpha = .5;
+	ctx.fillStyle = "red";
+	for(x = 0; x < traps.length; x++){
+		console.log(traps[x]);
+		// NOTE: the +5 on the Y side is just to move the square down a bit
+		// so you can read the direction letters.
+		ctx.fillRect(allRooms[traps[x]-1].textLocationX,allRooms[traps[x]-1].textLocationY+5,15,15);
+	}
+	
+	// DRAW OGRES
+	ctx.fillStyle = "darkgreen";
+	for(x = 0; x < ogres.length; x++){
+		console.log(ogres[x]);
+		// NOTE: the +5 on the Y side is just to move the square down a bit
+		// so you can read the direction letters.
+		ctx.fillRect(allRooms[ogres[x]-1].textLocationX,allRooms[ogres[x]-1].textLocationY+5,15,15);
+	}
+	ctx.globalAlpha = 1;
+}
+
+
+
 function generatePath(){
 	
 	// we always push room 1 on first since that is always where we start.
