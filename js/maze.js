@@ -74,7 +74,6 @@ function placeOgresAndTraps(){
 	// ####################
 
 	while (ogres.length < 5){ 
-		console.log("possibleOgresAndTraps : " + possibleOgresAndTraps);
 		var possibleOgre = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
 		ogres.push(possibleOgre);
 		if (possibleOgre == 2 || possibleOgre == 7){
@@ -99,19 +98,30 @@ function placeOgresAndTraps(){
 		}
 	}
 
-/*	while (traps.length < 5){
-		var possibleTrap = Math.ceil((Math.random() * (GRID_SIZE-2))+1);
-		addTrap = true;
-		for (x = 0; x< 5;x++){
-			if (ogres[x] == possibleTrap){addTrap = false;continue;}
+	while (traps.length < 5){
+		var possibleTrap = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
+		traps.push(possibleTrap);
+		if (possibleTrap == 2 || possibleTrap == 7){
+			if (possibleTrap - 2 == 0){
+				// remove 7 from possibleOgresAndTraps
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(7),1);
+			}
+			else{
+				//otherwise remove the 2
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(2),1);
+			}
 		}
-		for (x = 0; x<5;x++){
-			if (traps[x] == possibleTrap){addTrap = false;continue;}
+		if (possibleTrap == 30 || possibleTrap == 35){
+			if (possibleTrap - 30 == 0){
+				// remove 35 from possibleOgresAndTraps
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(35),1);
+			}
+			else{
+				//otherwise remove the 30
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(30),1);
+			}
 		}
-		if (addTrap){
-			traps.push(possibleTrap);
-		}
-	} */
+	} 
 	drawTrapsAndOgres();
 }
 
