@@ -10,6 +10,7 @@ var traps = [];
 possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
+var currentRoom = null;
 
 // path is an array of rooms used by generatePath()
 var path = [];
@@ -171,14 +172,12 @@ function drawTrapsAndOgres(){
 
 function generatePath(){
 	
-	// we always push room 1 on first since that is always where we start.
-	
 	var roomIndex = 0;
-	var currentRoom = allRooms[roomIndex];
+	currentRoom = allRooms[roomIndex];
 	currentRoom.isPath = true;
+	// we always push room 1 on first since that is always where we start.
 	path.push(currentRoom);
 	var counter = 0;
-	console.log("In generatePath()...");
 	
 	// Requirement is that the room cannot be added to the path if it has already been added
 		
@@ -406,6 +405,25 @@ function reTryPath(){
 	addOgresAndTrapsToRooms();
 	generatePath();
 	draw();
+}
+
+function retryUntilSolved(){
+	var attempts = 1;
+	while (attempts <= 100 && currentRoom.location != 36){
+		path= [];
+		initPossibles();
+		initializeRooms();
+		addOgresAndTrapsToRooms();
+		generatePath();
+		draw();
+		console.log("attempts : " + attempts++);
+	}
+	if (attempts < 100 && currentRoom.location == 36){
+		alert ("Solved it in " + attempts + " attempts.");
+	}
+	if (attempts >=100){
+		alert("Most likely, this map is unsolvable.");
+	}
 }
 
 function initUnblockedRooms(){
