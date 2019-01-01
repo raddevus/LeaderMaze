@@ -65,7 +65,6 @@ function generatePath(){
 	// if you entered from the w you are not allowed to leave e
 	
 	while (currentRoom.location != GRID_SIZE && counter < GRID_SIZE * 3){
-		console.log(currentRoom.location);
 		counter++;
 		// determine which way to exit from possible exits (doors)
 		var doorIndex = getExitDoor(currentRoom.doors);
@@ -114,7 +113,6 @@ function generatePath(){
 		currentRoom.visited = true;
 		path.push(currentRoom);
 	}
-	console.log(currentRoom.location);
 }
 
 function getExitDoor(doors){
