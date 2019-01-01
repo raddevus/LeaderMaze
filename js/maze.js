@@ -9,6 +9,7 @@ var ogres = [];
 var traps = [];
 possibleOgresAndTraps = [];
 var pathIndexer = 0;
+
 // path is an array of rooms used by generatePath()
 var path = [];
 var ctx = null;
@@ -55,24 +56,25 @@ function initPossibles(){
 	}
 }
 
-// var timerFlag = setInterval(function, milliseconds)
-// clearInterval(timerFlag);
-
+function drawPathSteps(){
+	if (pathIndexer < path.length -1){
+		ctx.moveTo(path[pathIndexer].textLocationX,path[pathIndexer].textLocationY);
+		ctx.lineTo(path[pathIndexer+1].textLocationX,path[pathIndexer+1].textLocationY);
+		ctx.stroke();
+		pathIndexer++;
+		setTimeout(drawPathSteps,100);
+	}
+	else{
+		pathIndexer = 0;
+	}
+	
+}
 
 function drawPath(){
 	ctx.strokeStyle = "darkorange";
 	ctx.lineWidth = 2;
 	ctx.beginPath();
-
-	while(pathIndexer < path.length -1){
-		console.log("pathIndexer : " + pathIndexer);
-		ctx.moveTo(path[pathIndexer].textLocationX,path[pathIndexer].textLocationY);
-		ctx.lineTo(path[pathIndexer+1].textLocationX,path[pathIndexer+1].textLocationY);
-		ctx.stroke();
-		pathIndexer++;
-	}
-	pathIndexer = 0;
-	
+	setTimeout(drawPathSteps, 100);
 }
 
 function placeOgresAndTraps(){
