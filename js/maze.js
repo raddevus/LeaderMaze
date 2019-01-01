@@ -42,6 +42,7 @@ var allRooms = [];
 initApp();
 initializeRooms();
 generatePath();
+placeOgresAndTraps();
 
 function drawPath(){
 	ctx.strokeStyle = "darkorange";
@@ -84,12 +85,14 @@ function placeOgresAndTraps(){
 			traps.push(possibleTrap);
 		}
 	}
-	
+	drawTrapsAndOgres();
+}
+
+function drawTrapsAndOgres(){
 	// DRAW TRAPS
 	ctx.globalAlpha = .5;
 	ctx.fillStyle = "red";
 	for(x = 0; x < traps.length; x++){
-		console.log(traps[x]);
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
 		ctx.fillRect(allRooms[traps[x]-1].textLocationX,allRooms[traps[x]-1].textLocationY+5,15,15);
@@ -98,15 +101,12 @@ function placeOgresAndTraps(){
 	// DRAW OGRES
 	ctx.fillStyle = "darkgreen";
 	for(x = 0; x < ogres.length; x++){
-		console.log(ogres[x]);
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
 		ctx.fillRect(allRooms[ogres[x]-1].textLocationX,allRooms[ogres[x]-1].textLocationY+5,15,15);
 	}
 	ctx.globalAlpha = 1;
 }
-
-
 
 function generatePath(){
 	
@@ -315,13 +315,14 @@ function getPossibleDirections(doors){
 	return possibleDirections;
 }
 function reGenPath(){
-allRooms = [];
-path = [];
-initApp();
-initializeRooms();
-generatePath();
-draw();
+	allRooms = [];
+	path = [];
+	initApp();
+	initializeRooms();
+	generatePath();
+	draw();
 }
+
 function initApp()
 {
 	theCanvas = document.getElementById("gamescreen");
@@ -413,6 +414,7 @@ function draw() {
 	if (path.length > 0){
 		drawPath();
 	}
+	drawTrapsAndOgres();
 }
 
 function hitTestReturnObject(mouseLocation, hitTestObjArray)
