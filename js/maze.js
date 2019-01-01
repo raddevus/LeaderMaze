@@ -56,14 +56,13 @@ function generatePath(){
 	
 	var roomIndex = 0;
 	var currentRoom = allRooms[roomIndex];
-	currentRoom.visited = true;
+	currentRoom.isPath = true;
 	path.push(currentRoom);
 	var counter = 0;
 	console.log("In generatePath()...");
 	
-	// Requirement is that the path cannot return to a room it just visited
-	// if you entered from the w you are not allowed to leave e
-	
+	// Requirement is that the room cannot be added to the path if it has already been added
+		
 	while (currentRoom.location != GRID_SIZE && counter < GRID_SIZE * 3){
 		counter++;
 		// determine which way to exit from possible exits (doors)
@@ -74,7 +73,7 @@ function generatePath(){
 		// 3 = w (subtract one from column)
 		switch (doorIndex){
 			case 0 : {
-				if (!allRooms[(currentRoom.location -1) - MAX_COLS].visited){
+				if (!allRooms[(currentRoom.location -1) - MAX_COLS].isPath){
 					currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
 				}
 				else{
@@ -83,7 +82,7 @@ function generatePath(){
 				break;
 			}
 			case 1 : {
-				if (!allRooms[(currentRoom.location -1) + MAX_COLS].visited){
+				if (!allRooms[(currentRoom.location -1) + MAX_COLS].isPath){
 					currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
 				}
 				else{
@@ -92,7 +91,7 @@ function generatePath(){
 				break;
 			}
 			case 2 : {
-				if (!allRooms[(currentRoom.location -1) + 1].visited){
+				if (!allRooms[(currentRoom.location -1) + 1].isPath){
 					currentRoom = allRooms[(currentRoom.location -1) + 1];
 				}
 				else{
@@ -101,7 +100,7 @@ function generatePath(){
 				break;
 			}
 			case 3 : {
-				if (!allRooms[(currentRoom.location -1) - 1].visited){
+				if (!allRooms[(currentRoom.location -1) - 1].isPath){
 					currentRoom = allRooms[(currentRoom.location -1) - 1];
 				}
 				else{
@@ -110,7 +109,7 @@ function generatePath(){
 				break;
 			}
 		}
-		currentRoom.visited = true;
+		currentRoom.isPath = true;
 		path.push(currentRoom);
 	}
 }
@@ -184,7 +183,7 @@ function room(roomInfo){
 	this.textLocationX = (this.column *(lineInterval )) - (lineInterval /2);
 	this.textLocationY = (this.row * (lineInterval )) - (lineInterval /2);
 	this.init = function(){
-	
+		this.isPath = false; // it isn't on path until a path is generated
 		// ###### If this is the first row, set up directions
 		if (this.row == 1){
 			this.doors[s] = 1;
