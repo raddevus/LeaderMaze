@@ -13,11 +13,12 @@ var traps = [];
 var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
-var mouseIsCaptured = false;
 var MAX_COLS = 6;//document.getElementById("colSize").value;
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var lineInterval = 0;
 var boardPos = null;
+
+var mouseIsCaptured = false;
 
 function boardLoc (loc){
 	this.x = loc.x;
@@ -317,8 +318,8 @@ function getPossibleDirections(doors){
 function reGenPath(){
 	allRooms = [];
 	path = [];
-	initApp();
 	initializeRooms();
+	placeOgresAndTraps();
 	generatePath();
 	draw();
 }
