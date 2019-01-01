@@ -12,7 +12,7 @@ var pathIndexer = 0;
 var unblockedRooms = [];
 var currentRoom = null;
 var MAX_COLS = 6;
-var MAX_ATTEMPTS = 100;
+var MAX_ATTEMPTS = 500;
 var MAX_OGRES_TRAPS = 5;
 var attempts = 0;
 // path is an array of rooms used by generatePath()
@@ -420,7 +420,7 @@ function retryUntilSolved(){
 		draw();
 		console.log("attempts : " + attempts++);
 	}
-	setTimeout(displayResults,2000);
+	setTimeout(displayResults,1300);
 }
 
 function displayResults(){
