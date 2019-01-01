@@ -11,7 +11,8 @@ possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
 var currentRoom = null;
-
+var MAX_ATTEMPTS = 100;
+var attempts = 0;
 // path is an array of rooms used by generatePath()
 var path = [];
 var ctx = null;
@@ -408,8 +409,8 @@ function reTryPath(){
 }
 
 function retryUntilSolved(){
-	var attempts = 1;
-	while (attempts <= 100 && currentRoom.location != 36){
+	
+	while (attempts < MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
 		path= [];
 		initPossibles();
 		initializeRooms();
@@ -418,12 +419,18 @@ function retryUntilSolved(){
 		draw();
 		console.log("attempts : " + attempts++);
 	}
-	if (attempts < 100 && currentRoom.location == 36){
+	setTimeout(displayResults,2000);
+}
+
+function displayResults(){
+	if (attempts < MAX_ATTEMPTS && currentRoom.location == GRID_SIZE){
 		alert ("Solved it in " + attempts + " attempts.");
 	}
-	if (attempts >=100){
+	if (attempts >=MAX_ATTEMPTS){
 		alert("Most likely, this map is unsolvable.");
 	}
+	
+	
 }
 
 function initUnblockedRooms(){
