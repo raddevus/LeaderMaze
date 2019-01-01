@@ -7,6 +7,7 @@ var e = 2;
 var w = 3;
 var ogres = [];
 var traps = [];
+possibleOgresAndTraps = [];
 
 // path is an array of rooms used by generatePath()
 	var path = [];
@@ -45,6 +46,13 @@ initializeRooms();
 placeOgresAndTraps();
 generatePath();
 
+function initPossibles(){
+	// location 1 and GRID_SIZE are off limits
+	// since they are the enter and exit rooms
+	for (x = 2; x < GRID_SIZE; x++){
+		possibleOgresAndTraps.push(x);
+	}
+}
 
 function drawPath(){
 	ctx.strokeStyle = "darkorange";
@@ -60,21 +68,38 @@ function drawPath(){
 function placeOgresAndTraps(){
 	ogres = [];
 	traps = [];
-	// rooms 1 and MAX_COLS are off limits for ogres and traps
-	// since they are the start and stop
-	ogres.push(Math.ceil((Math.random() * (GRID_SIZE-2))+1));
+	// ###  NOTES #########
+	// An ogre and trap can never be in locations 30 & 35 (blocks exit) or
+	// 2 and 7 (blocks entrance). 
+	// ####################
+
 	while (ogres.length < 5){ 
-		var possibleOgre = Math.ceil((Math.random() * (GRID_SIZE-2))+1);
-		var addOgre = true;
-		for (x = 0; x< 5;x++){
-			if (ogres[x] == possibleOgre){addOgre = false;continue;}
+		console.log("possibleOgresAndTraps : " + possibleOgresAndTraps);
+		var possibleOgre = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
+		ogres.push(possibleOgre);
+		if (possibleOgre == 2 || possibleOgre == 7){
+			if (possibleOgre - 2 == 0){
+				// remove 7 from possibleOgresAndTraps
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(7),1);
+			}
+			else{
+				//otherwise remove the 2
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(2),1);
+			}
 		}
-		if (addOgre){
-			ogres.push(possibleOgre);
+		if (possibleOgre == 30 || possibleOgre == 35){
+			if (possibleOgre - 30 == 0){
+				// remove 35 from possibleOgresAndTraps
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(35),1);
+			}
+			else{
+				//otherwise remove the 30
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(30),1);
+			}
 		}
 	}
-	
-	while (traps.length < 5){
+
+/*	while (traps.length < 5){
 		var possibleTrap = Math.ceil((Math.random() * (GRID_SIZE-2))+1);
 		addTrap = true;
 		for (x = 0; x< 5;x++){
@@ -86,7 +111,7 @@ function placeOgresAndTraps(){
 		if (addTrap){
 			traps.push(possibleTrap);
 		}
-	}
+	} */
 	drawTrapsAndOgres();
 }
 
@@ -319,6 +344,8 @@ function getPossibleDirections(doors){
 function reGenPath(){
 	allRooms = [];
 	path = [];
+	possibleOgresAndTraps = [];
+	initPossibles();
 	initializeRooms();
 	placeOgresAndTraps();
 	generatePath();
@@ -338,7 +365,7 @@ function initApp()
 	window.addEventListener("resize", draw());
 
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
-	
+	initPossibles();
 	draw();
 }
 
