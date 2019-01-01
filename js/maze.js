@@ -9,6 +9,7 @@ var ogres = [];
 var traps = [];
 possibleOgresAndTraps = [];
 var pathIndexer = 0;
+var unblockedRooms = [];
 
 // path is an array of rooms used by generatePath()
 var path = [];
@@ -43,6 +44,7 @@ function initRows(){
 
 var allRooms = [];
 initApp();
+initUnblockedRooms();
 initializeRooms();
 placeOgresAndTraps();
 addOgresAndTrapsToRooms();
@@ -88,24 +90,24 @@ function placeOgresAndTraps(){
 	while (ogres.length < 5){ 
 		var possibleOgre = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
 		ogres.push(possibleOgre);
-		if (possibleOgre == 2 || possibleOgre == 7){
-			if (possibleOgre - 2 == 0){
+		if (possibleOgre == unblockedRooms[0] || possibleOgre == unblockedRooms[1]){
+			if (possibleOgre - unblockedRooms[0] == 0){
 				// remove 7 from possibleOgresAndTraps
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(7),1);
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[1]),1);
 			}
 			else{
 				//otherwise remove the 2
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(2),1);
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[0]),1);
 			}
 		}
-		if (possibleOgre == 30 || possibleOgre == 35){
-			if (possibleOgre - 30 == 0){
+		if (possibleOgre == unblockedRooms[2] || possibleOgre == unblockedRooms[3]){
+			if (possibleOgre - unblockedRooms[2] == 0){
 				// remove 35 from possibleOgresAndTraps
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(35),1);
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[3]),1);
 			}
 			else{
 				//otherwise remove the 30
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(30),1);
+				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[2]),1);
 			}
 		}
 	}
@@ -387,12 +389,21 @@ function reGenPath(){
 	allRooms = [];
 	path = [];
 	possibleOgresAndTraps = [];
+	unblockedRooms = [];
+	initUnblockedRooms();
 	initPossibles();
 	initializeRooms();
 	placeOgresAndTraps();
 	addOgresAndTrapsToRooms();
 	generatePath();
 	draw();
+}
+
+function initUnblockedRooms(){
+	unblockedRooms.push(2); // 2 is always one no matter grid size.
+	unblockedRooms.push(MAX_COLS+1); // first room of 2nd row
+	unblockedRooms.push(MAX_COLS*(MAX_COLS-1)); // last room of 2nd to last row
+	unblockedRooms.push(GRID_SIZE-1); // 2nd to last room
 }
 
 function initApp()
