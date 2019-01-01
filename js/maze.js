@@ -451,7 +451,7 @@ function initApp()
 	boardPos = new boardLoc({x:ctx.canvas.width,y:ctx.canvas.height});
 	
 	//window.addEventListener("mousemove", handleMouseMove);
-	window.addEventListener("resize", draw());
+	window.addEventListener("resize", initApp);
 
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
 	initPossibles();
