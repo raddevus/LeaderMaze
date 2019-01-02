@@ -466,6 +466,26 @@ function initApp()
 {
 	console.log("in initapp...");
 
+	ogres = [];
+	traps = [];
+	cols = [];
+	rows = [];
+	allRooms = [];
+	possibleOgresAndTraps = [];
+	pathIndexer = 0;
+	unblockedRooms = [];
+	currentRoom = null;
+	maxColElement = document.getElementById("maxCols");
+	MAX_COLS = Number(maxColElement.value);
+	GRID_SIZE = MAX_COLS*MAX_COLS;
+	PREV_COL_SIZE = MAX_COLS;
+	MAX_ATTEMPTS = 500;
+	MAX_OGRES_TRAPS = 5;
+	attempts = 0;
+	// path is an array of rooms used by generatePath()
+	path = [];
+
+
 	theCanvas = document.getElementById("gamescreen");
 	ctx = theCanvas.getContext("2d");
 	
@@ -475,6 +495,7 @@ function initApp()
 	
 	//window.addEventListener("mousemove", handleMouseMove);
 	window.addEventListener("resize", initApp);
+	window.addEventListener("orientationchange", initApp);
 
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
 
