@@ -11,7 +11,10 @@ possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
 var currentRoom = null;
-var MAX_COLS = 6;
+var maxColElement = document.getElementById("maxCols");
+var MAX_COLS = Number(maxColElement.value);
+var GRID_SIZE = MAX_COLS*MAX_COLS;
+var PREV_COL_SIZE = MAX_COLS;
 var MAX_ATTEMPTS = 500;
 var MAX_OGRES_TRAPS = 5;
 var attempts = 0;
@@ -21,7 +24,7 @@ var ctx = null;
 var theCanvas = null;
 window.addEventListener("load", initApp);
 
-var GRID_SIZE = MAX_COLS*MAX_COLS;
+
 var lineInterval = 0;
 var boardPos = null;
 
@@ -32,8 +35,17 @@ function boardLoc (loc){
 	this.y = loc.y;
 }
 
+function initGrid(){
+	PREV_COL_SIZE = MAX_COLS;
+	MAX_COLS = Number(maxColElement.value);
+	GRID_SIZE = MAX_COLS*MAX_COLS;
+	initCols();
+	initRows();
+}
+
 var cols = [];
 function initCols(){
+	cols=[];
 	for (x = 0; x< MAX_COLS;x++){
 		cols.push(MAX_COLS*(x+1));
 	}
@@ -41,6 +53,7 @@ function initCols(){
 
 var rows = []; 
 function initRows(){
+	rows=[];
 	for (x = 0; x< MAX_COLS +1;x++){
 		rows.push(MAX_COLS*x+1);
 	}
@@ -256,8 +269,7 @@ function getExitDoor(doors){
 }
 
 function initializeRooms(){
-	initCols();
-	initRows();
+	initGrid();
 	
 	for (var i = 1; i <=GRID_SIZE;i++){
 		allRooms.push(new room({location:i}));
@@ -387,8 +399,12 @@ function getPossibleDirections(doors){
 	return possibleDirections;
 }
 function reGenPath(){
+	initGrid();
+	initApp();
 	allRooms = [];
 	path = [];
+	ogres = [];
+	traps = [];
 	possibleOgresAndTraps = [];
 	unblockedRooms = [];
 	initUnblockedRooms();
@@ -401,6 +417,11 @@ function reGenPath(){
 }
 
 function reTryPath(){
+	initGrid();
+	if (MAX_COLS != PREV_COL_SIZE){
+			reGenPath();
+			return;
+	}
 	path= [];
 	initPossibles();
 	initializeRooms();
