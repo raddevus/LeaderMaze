@@ -431,6 +431,11 @@ function reTryPath(){
 }
 
 function retryUntilSolved(){
+	initGrid();
+	if (MAX_COLS != PREV_COL_SIZE){
+			reGenPath();
+			return;
+	}
 	attempts = 0;
 	while (attempts < MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
 		path= [];
