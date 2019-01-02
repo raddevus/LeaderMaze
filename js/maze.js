@@ -7,6 +7,9 @@ var e = 2;
 var w = 3;
 var ogres = [];
 var traps = [];
+var cols = [];
+var rows = [];
+var allRooms = [];
 possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
@@ -22,13 +25,13 @@ var attempts = 0;
 var path = [];
 var ctx = null;
 var theCanvas = null;
-window.addEventListener("load", initApp);
-
-
 var lineInterval = 0;
 var boardPos = null;
-
 var mouseIsCaptured = false;
+
+console.log("before initapp...");
+window.addEventListener("load", initApp);
+console.log("after window.addEventListener(load, initApp)");
 
 function boardLoc (loc){
 	this.x = loc.x;
@@ -43,7 +46,7 @@ function initGrid(){
 	initRows();
 }
 
-var cols = [];
+
 function initCols(){
 	cols=[];
 	for (x = 0; x< MAX_COLS;x++){
@@ -51,21 +54,13 @@ function initCols(){
 	}
 }
 
-var rows = []; 
+
 function initRows(){
 	rows=[];
 	for (x = 0; x< MAX_COLS +1;x++){
 		rows.push(MAX_COLS*x+1);
 	}
 }
-
-var allRooms = [];
-initApp();
-initUnblockedRooms();
-initializeRooms();
-placeOgresAndTraps();
-addOgresAndTrapsToRooms();
-generatePath();
 
 function initPossibles(){
 	// location 1 and GRID_SIZE are off limits
@@ -469,6 +464,8 @@ function initUnblockedRooms(){
 
 function initApp()
 {
+	console.log("in initapp...");
+
 	theCanvas = document.getElementById("gamescreen");
 	ctx = theCanvas.getContext("2d");
 	
@@ -477,11 +474,25 @@ function initApp()
 	boardPos = new boardLoc({x:ctx.canvas.width,y:ctx.canvas.height});
 	
 	//window.addEventListener("mousemove", handleMouseMove);
-	// window.addEventListener("resize", initApp);
+	window.addEventListener("resize", initApp);
 
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
+
+	initGrid();
+	allRooms = [];
+	path = [];
+	ogres = [];
+	traps = [];
+	possibleOgresAndTraps = [];
+	unblockedRooms = [];
+	initUnblockedRooms();
 	initPossibles();
+	initializeRooms();
+	placeOgresAndTraps();
+	addOgresAndTrapsToRooms();
+	generatePath();
 	draw();
+
 }
 
 var rightKey = true;
