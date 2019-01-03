@@ -15,6 +15,8 @@ var pathIndexer = 0;
 var unblockedRooms = [];
 var currentRoom = null;
 var maxColElement = document.getElementById("maxCols");
+var challengesCheck = document.getElementById("challengesCheck");
+var isChallengesDisplayed = true;
 var MAX_COLS = Number(maxColElement.value);
 var GRID_SIZE = MAX_COLS*MAX_COLS;
 var PREV_COL_SIZE = MAX_COLS;
@@ -154,6 +156,11 @@ function addOgresAndTrapsToRooms(){
 }
 
 function drawTrapsAndOgres(){
+	console.log(isChallengesDisplayed);
+	if (!isChallengesDisplayed){
+		// user has turned off the display of challengesCheck
+		return;
+	}
 	// DRAW TRAPS
 	ctx.globalAlpha = .5;
 	ctx.fillStyle = "red";
@@ -476,6 +483,7 @@ function initApp()
 	unblockedRooms = [];
 	currentRoom = null;
 	maxColElement = document.getElementById("maxCols");
+	challengesCheck = document.getElementById("challengesCheck");
 	MAX_COLS = Number(maxColElement.value);
 	GRID_SIZE = MAX_COLS*MAX_COLS;
 	PREV_COL_SIZE = MAX_COLS;
@@ -587,6 +595,18 @@ function draw() {
 		drawPath();
 	}
 	drawTrapsAndOgres();
+}
+
+function displayChallengesClicked(){
+	if (challengesCheck.checked == true){
+		isChallengesDisplayed = true;
+		draw();
+	}
+	else{
+		isChallengesDisplayed = false;
+		draw();
+		console.log(isChallengesDisplayed);
+	}
 }
 
 function hitTestReturnObject(mouseLocation, hitTestObjArray)
