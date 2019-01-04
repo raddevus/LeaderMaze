@@ -13,6 +13,9 @@ var allRooms = [];
 possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
+var allTokens = [];
+// hoverToken -- token being hovered over with mouse
+var hoverToken = null;
 var currentRoom = null;
 var maxColElement = document.getElementById("maxCols");
 var challengesCheck = document.getElementById("challengesCheck");
@@ -501,9 +504,10 @@ function initApp()
 	ctx.canvas.width = ctx.canvas.height;
 	boardPos = new boardLoc({x:ctx.canvas.width,y:ctx.canvas.height});
 	
-	//window.addEventListener("mousemove", handleMouseMove);
 	window.addEventListener("resize", initApp);
 	window.addEventListener("orientationchange", initApp);
+	theCanvas.addEventListener("mousemove", handleMouseMove);
+    //window.addEventListener("mousedown", mouseDownHandler);
 
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
 
@@ -520,6 +524,7 @@ function initApp()
 	placeOgresAndTraps();
 	addOgresAndTrapsToRooms();
 	generatePath();
+	initTokens();
 	draw();
 
 }
@@ -549,6 +554,7 @@ function moveBackground(evt){
 function drawClippedAsset(sx,sy,swidth,sheight,x,y,w,h,imageId)
 {
 	var img = document.getElementById(imageId);
+	console.log("img : " + img);
 	if (img != null)
 	{
 		ctx.drawImage(img,sx,sy,swidth,sheight,x,y,w,h);
@@ -595,6 +601,43 @@ function draw() {
 		drawPath();
 	}
 	drawTrapsAndOgres();
+	
+	// draw each token it its current location
+    for (var tokenCount = 0; tokenCount < allTokens.length; tokenCount++) {
+
+        drawClippedAsset(
+            allTokens[tokenCount].imgSourceX,
+            allTokens[tokenCount].imgSourceY,
+            allTokens[tokenCount].imgSourceSize,
+            allTokens[tokenCount].imgSourceSize,
+            allTokens[tokenCount].gridLocation.x,
+            allTokens[tokenCount].gridLocation.y,
+            allTokens[tokenCount].size,
+            allTokens[tokenCount].size,
+            allTokens[tokenCount].imgIdTag
+        );
+    }
+	// if the mouse is hovering over the location of a token, show yellow highlight
+    if (hoverToken !== null) {
+        ctx.fillStyle = "yellow";
+        ctx.globalAlpha = .5
+        ctx.fillRect(hoverToken.gridLocation.x, hoverToken.gridLocation.y, 
+                  hoverToken.size, hoverToken.size);
+        ctx.globalAlpha = 1;
+
+        drawClippedAsset(
+            hoverToken.imgSourceX,
+            hoverToken.imgSourceY,
+            hoverToken.imgSourceSize,
+            hoverToken.imgSourceSize,
+            hoverToken.gridLocation.x,
+            hoverToken.gridLocation.y,
+            hoverToken.size,
+            hoverToken.size,
+            hoverToken.imgIdTag
+        );
+    }
+	
 }
 
 function displayChallengesClicked(){
@@ -607,6 +650,102 @@ function displayChallengesClicked(){
 		draw();
 		console.log(isChallengesDisplayed);
 	}
+}
+
+function gridlocation(value){
+    this.x = value.x;
+    this.y = value.y
+}
+
+function token(userToken){
+	// represents the users onscreen token
+    this.size = userToken.size;
+    this.imgSourceX = userToken.imgSourceX;
+    this.imgSourceY = userToken.imgSourceY;
+    this.imgSourceSize = userToken.imgSourceSize;
+    this.imgIdTag = userToken.imgIdTag;
+    this.gridLocation = userToken.gridLocation;
+}
+
+function initTokens(){
+        
+    if (allTokens.length == 0)
+    {
+        allTokens = [];
+
+        var currentToken =null;
+        // add 5 characters
+            for (var i = 0; i < 5;i++)
+            {
+                currentToken = new token({
+                        size:lineInterval,
+                        imgSourceX:i*150,
+                        imgSourceY:0*150,
+                        imgSourceSize:150,
+                        imgIdTag:'allCharacters',
+                        gridLocation: new gridlocation({x:i*lineInterval,y:3*lineInterval})
+                    });
+                    allTokens.push(currentToken);
+            }
+        console.log(allTokens);
+    }
+    draw();
+}
+
+function handleMouseMove(e)
+{
+    if (mouseIsCaptured)
+    {    
+        if (hoverItem.isMoving)
+        {
+        var tempx = e.clientX - hoverItem.offSetX;
+        var tempy = e.clientY - hoverItem.offSetY;
+        hoverItem.gridLocation.x = tempx;
+        hoverItem.gridLocation.y = tempy;
+         if (tempx < 0)
+          {
+            hoverItem.gridLocation.x = 0;
+          }
+          if (tempx + lineInterval > 650)
+          {
+            hoverItem.gridLocation.x = 650 - lineInterval;
+          }
+          if (tempy < 0)
+          { 
+            hoverItem.gridLocation.y = 0;
+          }
+          if (lineInterval + tempy > 650)
+          {
+            hoverItem.gridLocation.y = 650 - lineInterval;
+          }
+      
+        allTokens[hoverItem.idx]=hoverItem;
+        pawnR.server.send(hoverItem.gridLocation.x, hoverItem.gridLocation.y,hoverItem.idx);
+        }
+        draw();
+    }
+    // otherwise user is just moving mouse / highlight tokens
+    else
+    {
+        hoverToken = hitTestHoverItem({x:e.clientX,y:e.clientY}, allTokens);
+        draw();
+    }
+}
+
+function hitTestHoverItem(mouseLocation, hitTestObjArray)
+{
+  for (var k = 0;k < hitTestObjArray.length; k++)
+  {
+	var testObjXmax = hitTestObjArray[k].gridLocation.x + hitTestObjArray[k].size;
+	var testObjYmax = hitTestObjArray[k].gridLocation.y + hitTestObjArray[k].size;
+	if ( ((mouseLocation.x >= hitTestObjArray[k].gridLocation.x) && (mouseLocation.x <= testObjXmax)) && 
+		((mouseLocation.y >= hitTestObjArray[k].gridLocation.y) && (mouseLocation.y <= testObjYmax)))
+	  {
+		return hitTestObjArray[k];
+	  }
+  
+  }
+  return null;
 }
 
 function hitTestReturnObject(mouseLocation, hitTestObjArray)
