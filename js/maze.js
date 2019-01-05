@@ -159,7 +159,6 @@ function addOgresAndTrapsToRooms(){
 }
 
 function drawTrapsAndOgres(){
-	console.log(isChallengesDisplayed);
 	if (!isChallengesDisplayed){
 		// user has turned off the display of challengesCheck
 		return;
@@ -507,7 +506,7 @@ function initApp()
 	window.addEventListener("resize", initApp);
 	window.addEventListener("orientationchange", initApp);
 	theCanvas.addEventListener("mousemove", handleMouseMove);
-    //window.addEventListener("mousedown", mouseDownHandler);
+    window.addEventListener("mousedown", mouseDownHandler);
 
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
 
@@ -554,7 +553,6 @@ function moveBackground(evt){
 function drawClippedAsset(sx,sy,swidth,sheight,x,y,w,h,imageId)
 {
 	var img = document.getElementById(imageId);
-	console.log("img : " + img);
 	if (img != null)
 	{
 		ctx.drawImage(img,sx,sy,swidth,sheight,x,y,w,h);
@@ -576,10 +574,8 @@ function draw() {
 
 	textOut += "Width: " + ctx.canvas.width + "\n";
 
-	// ctx.fillText  (textOut, 50, 50);
 	var board=document.getElementById("board");
 	ctx.globalAlpha = .5;
-	//ctx.drawImage(board,boardPos.x,0,ctx.canvas.height,ctx.canvas.width);
 	ctx.globalAlpha = 1;
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
 
@@ -678,12 +674,12 @@ function initTokens(){
             for (var i = 0; i < 5;i++)
             {
                 currentToken = new token({
-                        size:lineInterval,
-                        imgSourceX:i*150,
-                        imgSourceY:0*150,
-                        imgSourceSize:150,
+                        size:30,
+                        imgSourceX:i*30,
+                        imgSourceY:0*30,
+                        imgSourceSize:30,
                         imgIdTag:'allCharacters',
-                        gridLocation: new gridlocation({x:i*lineInterval,y:3*lineInterval})
+                        gridLocation: new gridlocation({x:i*30,y:5*30})
                     });
                     allTokens.push(currentToken);
             }
@@ -786,10 +782,38 @@ function hitTest(mouseLocation, hitTestObject)
 }
 
 var point = function(x,y)
-  {
-    this.x = x;
-    this.y = y;
-  };
+{
+this.x = x;
+this.y = y;
+};
+
+function mouseDownHandler(event)
+{
+
+var currentPoint = getMousePos(event);
+// barricades are added so that later added barricades have a higher z-order
+// that means if one is on top of the other the later added one will also
+// need to be hitTested first. That means we need to iterate through
+// the array from largest indext to smallest
+	for (var tokenCount = allTokens.length-1;tokenCount >=0;tokenCount--)
+	{
+	  if (hitTest(currentPoint, allTokens[tokenCount]))
+	  {
+		currentToken = allTokens[tokenCount];
+		// the offset value is the diff. between the place inside the barricade
+		// where the user clicked and the barricade's xy origin.
+		currentToken.offSetX = currentPoint.x - currentToken.gridLocation.x;
+		currentToken.offSetY = currentPoint.y - currentToken.gridLocation.y;
+		currentToken.isMoving = true;
+		currentToken.idx = tokenCount;
+		hoverItem = currentToken;
+		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
+		mouseIsCaptured = true;
+		window.addEventListener("mouseup",mouseUpHandler);
+		break;
+	  }
+	}
+}
 
 function mouseUpHandler()
 {
