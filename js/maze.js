@@ -520,6 +520,7 @@ function initApp()
 	generatePath();
 	initPlayers();
 	initTokens();
+	startGame();
 	draw();
 
 }
@@ -756,6 +757,24 @@ function initPlayers(){
 	allPlayers.push (new player({characterType: "thief", token: new token()})); 
 	allPlayers.push (new player({characterType: "elf", token: new token()})); 
 	allPlayers.push (new player({characterType: "leader", token: new token()})); 
+}
+
+function startGame(){
+	var roomNumber = 0;
+	// barbarian
+	allPlayers[0].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1), y:lineInterval * (allRooms[roomNumber].row-1)}
+	//wizard  
+	// wizardOffset 
+	var wizardOffset = lineInterval
+	allPlayers[1].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1) + lineInterval - 45, y:lineInterval * (allRooms[roomNumber].row-1)}
+	// thief
+	allPlayers[2].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1) + (lineInterval /2 ) -15, y:lineInterval * (allRooms[roomNumber].row-1) + (lineInterval /2) -20}
+	//elf
+	allPlayers[3].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1), y:lineInterval * (allRooms[roomNumber].row-1)+(lineInterval/2)}
+	//leader
+	allPlayers[4].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1) + lineInterval - 45, y:lineInterval * (allRooms[roomNumber].row-1)+(lineInterval/2)}
+	
+	
 }
 
 var player = function (initData){
