@@ -14,6 +14,7 @@ possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
 var allTokens = [];
+var allPlayers = [];
 // hoverToken -- token being hovered over with mouse
 var hoverToken = null;
 var currentRoom = null;
@@ -523,6 +524,7 @@ function initApp()
 	placeOgresAndTraps();
 	addOgresAndTrapsToRooms();
 	generatePath();
+	initPlayers();
 	initTokens();
 	draw();
 
@@ -782,6 +784,23 @@ var point = function(x,y)
 this.x = x;
 this.y = y;
 };
+
+function initPlayers(){
+	allPlayers.push (new player({characterType: "barbarian"})); 
+	allPlayers.push (new player({characterType: "wizard"}));
+	allPlayers.push (new player({characterType: "thief"}));
+	allPlayers.push (new player({characterType: "elf"}));
+	allPlayers.push (new player({characterType: "leader"}));
+}
+
+var player = function (initData){
+	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
+	this.characterType = initData.characterType;
+	
+	this.setToken = function (token){
+		this.token = token;
+	}
+}
 
 function mouseDownHandler(event)
 {
