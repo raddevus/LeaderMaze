@@ -1,6 +1,5 @@
-// board.js
+// maze.js
 
-// function definition
 var n = 0;
 var s = 1;
 var e = 2;
@@ -32,17 +31,12 @@ var path = [];
 var ctx = null;
 var theCanvas = null;
 var lineInterval = 0;
-var boardPos = null;
+
 var mouseIsCaptured = false;
 
 console.log("before initapp...");
 window.addEventListener("load", initApp);
 console.log("after window.addEventListener(load, initApp)");
-
-function boardLoc (loc){
-	this.x = loc.x;
-	this.y = loc.y;
-}
 
 function initGrid(){
 	PREV_COL_SIZE = MAX_COLS;
@@ -502,7 +496,6 @@ function initApp()
 	
 	ctx.canvas.height  = window.innerHeight-5;
 	ctx.canvas.width = ctx.canvas.height;
-	boardPos = new boardLoc({x:ctx.canvas.width,y:ctx.canvas.height});
 	
 	window.addEventListener("resize", initApp);
 	window.addEventListener("orientationchange", initApp);
@@ -518,6 +511,7 @@ function initApp()
 	traps = [];
 	possibleOgresAndTraps = [];
 	unblockedRooms = [];
+	allPlayers = [];
 	initUnblockedRooms();
 	initPossibles();
 	initializeRooms();
@@ -528,28 +522,6 @@ function initApp()
 	initTokens();
 	draw();
 
-}
-
-var rightKey = true;
-function moveBackground(evt){
-	switch (evt.keyCode)
-	{
-		case 37 :
-		{
-			boardPos.x+=5; // left
-			rightKey = false;
-			draw();
-			break;
-		}
-		case 39 : //right
-		{
-			boardPos.x-=5;
-			rightKey = true;
-			draw();
-			break;
-		}
-	}
-	
 }
 
 function drawClippedAsset(sx,sy,swidth,sheight,x,y,w,h,imageId)
@@ -576,8 +548,6 @@ function draw() {
 
 	textOut += "Width: " + ctx.canvas.width + "\n";
 
-	var board=document.getElementById("board");
-	ctx.globalAlpha = .5;
 	ctx.globalAlpha = 1;
 	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
 
