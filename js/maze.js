@@ -716,7 +716,6 @@ function handleMouseMove(e)
           }
       
         allTokens[hoverItem.idx]=hoverItem;
-        pawnR.server.send(hoverItem.gridLocation.x, hoverItem.gridLocation.y,hoverItem.idx);
         }
         draw();
     }
@@ -768,14 +767,11 @@ function hitTestReturnObject(mouseLocation, hitTestObjArray)
 
 function hitTest(mouseLocation, hitTestObject)
 {
-  console.log("hitTest...");
-  var testObjXmax = hitTestObject.x + hitTestObject.width;
-  var testObjYmax = hitTestObject.y + hitTestObject.height;
-  if ( ((mouseLocation.x >= hitTestObject.x) && (mouseLocation.x <= testObjXmax)) && 
-	((mouseLocation.y >= hitTestObject.y) && (mouseLocation.y <= testObjYmax)))
+  var testObjXmax = hitTestObject.gridLocation.x + hitTestObject.size;
+  var testObjYmax = hitTestObject.gridLocation.y + hitTestObject.size;
+  if ( ((mouseLocation.x >= hitTestObject.gridLocation.x) && (mouseLocation.x <= testObjXmax)) && 
+	((mouseLocation.y >= hitTestObject.gridLocation.y) && (mouseLocation.y <= testObjYmax)))
   {
-	console.log("you got it");
-	
 	return true;
   }
   return false;
@@ -819,7 +815,7 @@ function mouseUpHandler()
 {
 	if (mouseIsCaptured)
 	{
-		playSound(POP,1);
+		//playSound(POP,1);
 	}
 	mouseIsCaptured = false;
 	for (var j = 0; j < allTokens.length;j++)
@@ -827,12 +823,12 @@ function mouseUpHandler()
 		allTokens[j].isMoving = false;
 	}
 	//$("#canvas").die("mousemove");
-	window.removeEventListener("mousemove");
+	window.removeEventListener("mousemove", mouseDownHandler);
 	//clearInterval(stopDraw);
 	// draw once more to make sure item is at last location
 	//draw();
 	//console.log("mouseUpHandler");
-	window.removeEventListener("mouseup");
+	window.removeEventListener("mouseup", mouseUpHandler);
 }
 
    function getMousePos(evt) {
