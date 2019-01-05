@@ -674,12 +674,12 @@ function initTokens(){
             for (var i = 0; i < 5;i++)
             {
                 currentToken = new token({
-                        size:30,
-                        imgSourceX:i*30,
-                        imgSourceY:0*30,
-                        imgSourceSize:30,
-                        imgIdTag:'allCharacters',
-                        gridLocation: new gridlocation({x:i*30,y:5*30})
+                        size:45,
+                        imgSourceX:i*60,
+                        imgSourceY:0*60,
+                        imgSourceSize:60,
+                        imgIdTag:'characterSet1',
+                        gridLocation: new gridlocation({x:i*45,y:5*45})
                     });
                     allTokens.push(currentToken);
             }
@@ -822,12 +822,7 @@ function mouseUpHandler()
 	{
 		allTokens[j].isMoving = false;
 	}
-	//$("#canvas").die("mousemove");
 	window.removeEventListener("mousemove", mouseDownHandler);
-	//clearInterval(stopDraw);
-	// draw once more to make sure item is at last location
-	//draw();
-	//console.log("mouseUpHandler");
 	window.removeEventListener("mouseup", mouseUpHandler);
 }
 
