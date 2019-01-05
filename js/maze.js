@@ -572,7 +572,6 @@ function draw() {
 	
 	// draw each token it its current location
     for (var tokenCount = 0; tokenCount < allPlayers.length; tokenCount++) {
-		console.log("tokenCount : " + tokenCount);
         drawClippedAsset(
             allPlayers[tokenCount].token.imgSourceX,
             allPlayers[tokenCount].token.imgSourceY,
@@ -765,7 +764,6 @@ var player = function (initData){
 	this.token = initData.token;
 	this.setToken = function (token){
 		this.token = token;
-		console.log("this.token : " + this.token);
 	};
 }
 
