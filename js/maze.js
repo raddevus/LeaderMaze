@@ -15,6 +15,7 @@ var pathIndexer = 0;
 var unblockedRooms = [];
 var allTokens = [];
 var allPlayers = [];
+var hoverItem = null;
 // hoverToken -- token being hovered over with mouse
 var hoverToken = null;
 var currentRoom = null;
@@ -601,18 +602,18 @@ function draw() {
 	drawTrapsAndOgres();
 	
 	// draw each token it its current location
-    for (var tokenCount = 0; tokenCount < allTokens.length; tokenCount++) {
-
+    for (var tokenCount = 0; tokenCount < allPlayers.length; tokenCount++) {
+		console.log("tokenCount : " + tokenCount);
         drawClippedAsset(
-            allTokens[tokenCount].imgSourceX,
-            allTokens[tokenCount].imgSourceY,
-            allTokens[tokenCount].imgSourceSize,
-            allTokens[tokenCount].imgSourceSize,
-            allTokens[tokenCount].gridLocation.x,
-            allTokens[tokenCount].gridLocation.y,
-            allTokens[tokenCount].size,
-            allTokens[tokenCount].size,
-            allTokens[tokenCount].imgIdTag
+            allPlayers[tokenCount].token.imgSourceX,
+            allPlayers[tokenCount].token.imgSourceY,
+            allPlayers[tokenCount].token.imgSourceSize,
+            allPlayers[tokenCount].token.imgSourceSize,
+            allPlayers[tokenCount].token.gridLocation.x,
+            allPlayers[tokenCount].token.gridLocation.y,
+            allPlayers[tokenCount].token.size,
+            allPlayers[tokenCount].token.size,
+            allPlayers[tokenCount].token.imgIdTag
         );
     }
 	// if the mouse is hovering over the location of a token, show yellow highlight
@@ -657,12 +658,14 @@ function gridlocation(value){
 
 function token(userToken){
 	// represents the users onscreen token
+	if (userToken !== undefined){
     this.size = userToken.size;
     this.imgSourceX = userToken.imgSourceX;
     this.imgSourceY = userToken.imgSourceY;
     this.imgSourceSize = userToken.imgSourceSize;
     this.imgIdTag = userToken.imgIdTag;
     this.gridLocation = userToken.gridLocation;
+	}
 }
 
 function initTokens(){
@@ -683,7 +686,8 @@ function initTokens(){
                         imgIdTag:'characterSet1',
                         gridLocation: new gridlocation({x:i*45,y:5*45})
                     });
-                    allTokens.push(currentToken);
+                    allPlayers[i].setToken(currentToken);
+					allTokens.push(currentToken);
             }
         console.log(allTokens);
     }
@@ -696,35 +700,37 @@ function handleMouseMove(e)
     {    
         if (hoverItem.isMoving)
         {
-        var tempx = e.clientX - hoverItem.offSetX;
-        var tempy = e.clientY - hoverItem.offSetY;
-        hoverItem.gridLocation.x = tempx;
-        hoverItem.gridLocation.y = tempy;
-         if (tempx < 0)
-          {
-            hoverItem.gridLocation.x = 0;
-          }
-          if (tempx + lineInterval > 650)
-          {
-            hoverItem.gridLocation.x = 650 - lineInterval;
-          }
-          if (tempy < 0)
-          { 
-            hoverItem.gridLocation.y = 0;
-          }
-          if (lineInterval + tempy > 650)
-          {
-            hoverItem.gridLocation.y = 650 - lineInterval;
-          }
-      
-        allTokens[hoverItem.idx]=hoverItem;
+			var tempx = e.clientX - hoverItem.offSetX;
+			var tempy = e.clientY - hoverItem.offSetY;
+			hoverItem.gridLocation.x = tempx;
+			hoverItem.gridLocation.y = tempy;
+			 if (tempx < 0)
+			  {
+				hoverItem.gridLocation.x = 0;
+			  }
+			  if (tempx + lineInterval > 650)
+			  {
+				hoverItem.gridLocation.x = 650 - lineInterval;
+			  }
+			  if (tempy < 0)
+			  { 
+				hoverItem.gridLocation.y = 0;
+			  }
+			  if (lineInterval + tempy > 650)
+			  {
+				hoverItem.gridLocation.y = 650 - lineInterval;
+			  }
         }
         draw();
     }
     // otherwise user is just moving mouse / highlight tokens
     else
     {
-        hoverToken = hitTestHoverItem({x:e.clientX,y:e.clientY}, allTokens);
+		var playerTokens = [];
+		for (x = 0; x < allPlayers.length;x++){
+			playerTokens.push(allPlayers[x].token);
+		}
+        hoverToken = hitTestHoverItem({x:e.clientX,y:e.clientY}, playerTokens);
         draw();
     }
 }
@@ -786,20 +792,21 @@ this.y = y;
 };
 
 function initPlayers(){
-	allPlayers.push (new player({characterType: "barbarian"})); 
-	allPlayers.push (new player({characterType: "wizard"}));
-	allPlayers.push (new player({characterType: "thief"}));
-	allPlayers.push (new player({characterType: "elf"}));
-	allPlayers.push (new player({characterType: "leader"}));
+	allPlayers.push (new player({characterType: "barbarian", token: new token()})); 
+	allPlayers.push (new player({characterType: "wizard", token: new token()})); 
+	allPlayers.push (new player({characterType: "thief", token: new token()})); 
+	allPlayers.push (new player({characterType: "elf", token: new token()})); 
+	allPlayers.push (new player({characterType: "leader", token: new token()})); 
 }
 
 var player = function (initData){
 	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
 	this.characterType = initData.characterType;
-	
+	this.token = initData.token;
 	this.setToken = function (token){
 		this.token = token;
-	}
+		console.log("this.token : " + this.token);
+	};
 }
 
 function mouseDownHandler(event)
@@ -810,11 +817,12 @@ var currentPoint = getMousePos(event);
 // that means if one is on top of the other the later added one will also
 // need to be hitTested first. That means we need to iterate through
 // the array from largest indext to smallest
-	for (var tokenCount = allTokens.length-1;tokenCount >=0;tokenCount--)
+	for (var tokenCount = allPlayers.length-1;tokenCount >=0;tokenCount--)
 	{
-	  if (hitTest(currentPoint, allTokens[tokenCount]))
+	  if (hitTest(currentPoint, allPlayers[tokenCount].token))
 	  {
-		currentToken = allTokens[tokenCount];
+		currentToken = allPlayers[tokenCount].token;
+		console.log(currentToken);
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
 		currentToken.offSetX = currentPoint.x - currentToken.gridLocation.x;
@@ -822,6 +830,7 @@ var currentPoint = getMousePos(event);
 		currentToken.isMoving = true;
 		currentToken.idx = tokenCount;
 		hoverItem = currentToken;
+		allPlayers[tokenCount].setToken(currentToken);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		mouseIsCaptured = true;
 		window.addEventListener("mouseup",mouseUpHandler);
@@ -837,9 +846,9 @@ function mouseUpHandler()
 		//playSound(POP,1);
 	}
 	mouseIsCaptured = false;
-	for (var j = 0; j < allTokens.length;j++)
+	for (var j = 0; j < allPlayers.length;j++)
 	{
-		allTokens[j].isMoving = false;
+		allPlayers[j].token.isMoving = false;
 	}
 	window.removeEventListener("mousemove", mouseDownHandler);
 	window.removeEventListener("mouseup", mouseUpHandler);
