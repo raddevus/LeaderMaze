@@ -13,7 +13,6 @@ var allRooms = [];
 possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
-var allTokens = [];
 var allPlayers = [];
 var hoverItem = null;
 // hoverToken -- token being hovered over with mouse
@@ -669,29 +668,20 @@ function token(userToken){
 }
 
 function initTokens(){
-        
-    if (allTokens.length == 0)
-    {
-        allTokens = [];
-
-        var currentToken =null;
-        // add 5 characters
-            for (var i = 0; i < 5;i++)
-            {
-                currentToken = new token({
-                        size:45,
-                        imgSourceX:i*60,
-                        imgSourceY:0*60,
-                        imgSourceSize:60,
-                        imgIdTag:'characterSet1',
-                        gridLocation: new gridlocation({x:i*45,y:5*45})
-                    });
-                    allPlayers[i].setToken(currentToken);
-					allTokens.push(currentToken);
-            }
-        console.log(allTokens);
-    }
-    draw();
+	var currentToken =null;
+	// add a token to each player
+	for (var i = 0; i < 5;i++)
+	{
+		currentToken = new token({
+				size:45,
+				imgSourceX:i*60,
+				imgSourceY:0*60,
+				imgSourceSize:60,
+				imgIdTag:'characterSet1',
+				gridLocation: new gridlocation({x:i*45,y:5*45})
+			});
+			allPlayers[i].setToken(currentToken);
+	}
 }
 
 function handleMouseMove(e)
@@ -822,7 +812,6 @@ var currentPoint = getMousePos(event);
 	  if (hitTest(currentPoint, allPlayers[tokenCount].token))
 	  {
 		currentToken = allPlayers[tokenCount].token;
-		console.log(currentToken);
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
 		currentToken.offSetX = currentPoint.x - currentToken.gridLocation.x;
