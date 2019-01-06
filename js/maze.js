@@ -327,6 +327,9 @@ function room(roomInfo){
 	this.row = getRowNumber(this.location);
 	this.textLocationX = (this.column *(lineInterval )) - (lineInterval /2);
 	this.textLocationY = (this.row * (lineInterval )) - (lineInterval /2);
+	this.minPoint = new point ((this.column-1) * lineInterval, (this.row-1)*lineInterval);
+	this.maxPoint = new point ((this.column) * lineInterval, (this.row)*lineInterval);;
+	
 	this.init = function(){
 		this.isPath = false; // it isn't on path until a path is generated
 		this.hasOgre = false;
@@ -845,12 +848,21 @@ function updateGameClock(){
 	el.innerHTML = gameclockSecondCounter;
 }
 
-function hitTestRoom(){
-	allRooms[0]
-}
-
-function canPlayerMoveHere(movedPlayer){
-	movedPlayer.token.gridLocation.x
+function hitTestRoom(player){
+	// pass in player object and check which room she has moved to
+	// return room where player has moved her token
+	
+	for (var k = 0;k < allRooms.length; k++)
+	{
+		var testObjXmax = allRooms[k].maxPoint.x;// + 45;
+		var testObjYmax = allRooms[k].maxPoint.y;// + hitTestObjArray[k].size;
+		if ( ((player.token.gridLocation.x >= allRooms[k].minPoint.x) && (player.token.gridLocation.x <= testObjXmax)) && 
+			((player.token.gridLocation.y >= allRooms[k].minPoint.y) && (player.token.gridLocation.y <= testObjYmax)))
+		{
+			return allRooms[k];
+		}
+	}
+	return null;
 }
 
 function mouseUpHandler()
@@ -868,11 +880,11 @@ function mouseUpHandler()
 	window.removeEventListener("mouseup", mouseUpHandler);
 }
 
-   function getMousePos(evt) {
-        
-        var rect = theCanvas.getBoundingClientRect();
-        var currentPoint = new point();
-        currentPoint.x = evt.clientX - rect.left;
-        currentPoint.y = evt.clientY - rect.top;
-        return currentPoint;
-  }
+function getMousePos(evt) {
+	
+	var rect = theCanvas.getBoundingClientRect();
+	var currentPoint = new point();
+	currentPoint.x = evt.clientX - rect.left;
+	currentPoint.y = evt.clientY - rect.top;
+	return currentPoint;
+}
