@@ -4,3 +4,4 @@ body,html {margin:0;padding:0;}
 .buttonPads{padding: 5px 5px 5px 5px; margin : 5px 5px 5px 5px;}
 #scoreboard {height:50px; width:100%;}
 #gameclock{width:100%; margin-left: 15px;margin-top:5px;font-famil:tahoma;font-size: 20pt;}
+#output{margin : 5px 5px 5px 5px;}

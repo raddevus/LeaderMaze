@@ -875,30 +875,32 @@ function setPlayerDead(player){
 }
 
 function handlePlayerMovement(room, player){
-	console.log(player.characterType + " moved into room " + room.location);
+	var output = document.getElementById("output");
+	
+	output.innerHTML = player.characterType + " moved into room " + room.location;
 	if (room.location == GRID_SIZE){
-		alert("You've won!");
+		output.innerHTML += "  You've won!";
 	}
 	if (room.hasOgre){
 		if (player.characterType != "barbarian"){
-			console.log("An ogre leaps on you and kills you! " +  player.characterType + " is dead.");
+			output.innerHTML += "  An ogre leaps on you and kills you! " +  player.characterType + " is dead.";
 			setPlayerDead(player);
 			draw();
 		}
 		else{
-			console.log("You barbarian! You've killed an ogre.");
+			output.innerHTML += " You barbarian! You've killed an ogre.";
 			room.hasOgre = false;
 		}
 	}
 	
 	if (room.hasTrap){
 		if (player.characterType != "thief"){
-			console.log(player.characterType + " has sprung a trap! "  +  player.characterType + " is dead.");
+			output.innerHTML +=  "  " + player.characterType + " has sprung a trap! "  +  player.characterType + " is dead.";
 			setPlayerDead(player);
 			draw();
 		}
 		else{
-			console.log("You thief! You've disarmed a trap.");
+			output.innerHTML += "  You thief! You've disarmed a trap.";
 			room.hasTrap = false;
 		}
 	}
