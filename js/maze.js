@@ -585,7 +585,7 @@ function draw() {
 		}
 	}
 	if (path.length > 0){
-		drawPath();
+		//drawPath();
 	}
 	drawTrapsAndOgres();
 	
@@ -876,6 +876,9 @@ function setPlayerDead(player){
 
 function handlePlayerMovement(room, player){
 	console.log(player.characterType + " moved into room " + room.location);
+	if (room.location == GRID_SIZE){
+		alert("You've won!");
+	}
 	if (room.hasOgre){
 		if (player.characterType != "barbarian"){
 			console.log("An ogre leaps on you and kills you! " +  player.characterType + " is dead.");
