@@ -923,8 +923,6 @@ function mouseUpHandler()
 	var actionRoom = hitTestRoom(allPlayers[playerIdxMovingToken]);
 	handlePlayerMovement(actionRoom, allPlayers[playerIdxMovingToken]);
 	playerIdxMovingToken = -1;
-	
-	
 }
 
 function getMousePos(evt) {
