@@ -591,17 +591,17 @@ function draw() {
 	
 	// draw each token it its current location
     for (var tokenCount = 0; tokenCount < allPlayers.length; tokenCount++) {
-        drawClippedAsset(
-            allPlayers[tokenCount].token.imgSourceX,
-            allPlayers[tokenCount].token.imgSourceY,
-            allPlayers[tokenCount].token.imgSourceSize,
-            allPlayers[tokenCount].token.imgSourceSize,
-            allPlayers[tokenCount].token.gridLocation.x,
-            allPlayers[tokenCount].token.gridLocation.y,
-            allPlayers[tokenCount].token.size,
-            allPlayers[tokenCount].token.size,
-            allPlayers[tokenCount].token.imgIdTag
-        );
+		drawClippedAsset(
+			allPlayers[tokenCount].token.imgSourceX,
+			allPlayers[tokenCount].token.imgSourceY,
+			allPlayers[tokenCount].token.imgSourceSize,
+			allPlayers[tokenCount].token.imgSourceSize,
+			allPlayers[tokenCount].token.gridLocation.x,
+			allPlayers[tokenCount].token.gridLocation.y,
+			allPlayers[tokenCount].token.size,
+			allPlayers[tokenCount].token.size,
+			allPlayers[tokenCount].token.imgIdTag
+		);
     }
 	// if the mouse is hovering over the location of a token, show yellow highlight
     if (hoverToken !== null) {
@@ -610,20 +610,18 @@ function draw() {
         ctx.fillRect(hoverToken.gridLocation.x, hoverToken.gridLocation.y, 
                   hoverToken.size, hoverToken.size);
         ctx.globalAlpha = 1;
-
-        drawClippedAsset(
-            hoverToken.imgSourceX,
-            hoverToken.imgSourceY,
-            hoverToken.imgSourceSize,
-            hoverToken.imgSourceSize,
-            hoverToken.gridLocation.x,
-            hoverToken.gridLocation.y,
-            hoverToken.size,
-            hoverToken.size,
-            hoverToken.imgIdTag
-        );
+		drawClippedAsset(
+			hoverToken.imgSourceX,
+			hoverToken.imgSourceY,
+			hoverToken.imgSourceSize,
+			hoverToken.imgSourceSize,
+			hoverToken.gridLocation.x,
+			hoverToken.gridLocation.y,
+			hoverToken.size,
+			hoverToken.size,
+			hoverToken.imgIdTag
+		);
     }
-	
 }
 
 function displayChallengesClicked(){
@@ -691,7 +689,6 @@ function handleMouseMove(e)
 			  }
 			  if (hoverItemPoint.x >= maxGridLocation)
 			  {
-				console.log(hoverItemPoint);
 				hoverItem.gridLocation.x = maxGridLocation;
 			  }
 			  if (hoverItemPoint.y < 0)
@@ -867,23 +864,39 @@ function hitTestRoom(player){
 	return null;
 }
 
+function setPlayerDead(player){
+	for (x = 0; x < allPlayers.length;x++){
+		if (allPlayers[x].characterType == player.characterType){
+			console.log(allPlayers[x].characterType + " confirmed dead.");
+			allPlayers.splice(x,1);
+			return;
+		}
+	}
+}
+
 function handlePlayerMovement(room, player){
 	console.log(player.characterType + " moved into room " + room.location);
 	if (room.hasOgre){
 		if (player.characterType != "barbarian"){
 			console.log("An ogre leaps on you and kills you! " +  player.characterType + " is dead.");
+			setPlayerDead(player);
+			draw();
 		}
 		else{
 			console.log("You barbarian! You've killed an ogre.");
+			room.hasOgre = false;
 		}
 	}
 	
 	if (room.hasTrap){
 		if (player.characterType != "thief"){
 			console.log(player.characterType + " has sprung a trap! "  +  player.characterType + " is dead.");
+			setPlayerDead(player);
+			draw();
 		}
 		else{
 			console.log("You thief! You've disarmed a trap.");
+			room.hasTrap = false;
 		}
 	}
 	
