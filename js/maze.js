@@ -425,6 +425,8 @@ function reGenPath(){
 	placeOgresAndTraps();
 	addOgresAndTrapsToRooms();
 	generatePath();
+	var el = document.getElementById("output");
+	el.innerHTML = "";
 	draw();
 }
 
@@ -903,6 +905,11 @@ function handlePlayerMovement(room, player){
 			output.innerHTML += "  You thief! You've disarmed a trap.";
 			room.hasTrap = false;
 		}
+	}
+	
+	if (allPlayers.length <= 0){
+			output.innerHTML += "  All your characters are dead.  You failed! :(";
+			stopClock();
 	}
 	
 }
