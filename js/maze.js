@@ -14,6 +14,12 @@ var pathIndexer = 0;
 var unblockedRooms = [];
 var allPlayers = [];
 var hoverItem = null;
+var gameclockSecondCounter = 0;
+var gameclockHandle = null;
+
+// we have a scoreboard that takes up the top 50px so 
+// the canvas is always offset by 50px (value is set up in css scoreboard element)
+var gridTopOffset = 50;
 // hoverToken -- token being hovered over with mouse
 var hoverToken = null;
 var currentRoom = null;
@@ -406,6 +412,9 @@ function reGenPath(){
 	traps = [];
 	possibleOgresAndTraps = [];
 	unblockedRooms = [];
+	stopClock();
+	gameclockHandle = setInterval(updateGameClock, 1000);
+	gameclockSecondCounter = 0;
 	initUnblockedRooms();
 	initPossibles();
 	initializeRooms();
@@ -466,6 +475,25 @@ function initUnblockedRooms(){
 	unblockedRooms.push(GRID_SIZE-1); // 2nd to last room
 }
 
+function initCanvas(){
+	
+	ctx.canvas.height  = (window.innerHeight - lineInterval);
+	ctx.canvas.width = ctx.canvas.height;
+	
+	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
+	
+	// the -5 in the two following lines makes the canvas area, just slightly smaller
+	// than the entire window.  this helps so the scrollbars do not appear.
+	ctx.canvas.height  = (window.innerHeight-lineInterval);
+	ctx.canvas.width = ctx.canvas.height;
+	ctx.strokeStyle = '#0000ff';
+
+	ctx.font = '10px sans-serif';
+
+	ctx.globalAlpha = 1;
+	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
+}
+
 function initApp()
 {
 	console.log("in initapp...");
@@ -490,20 +518,6 @@ function initApp()
 	// path is an array of rooms used by generatePath()
 	path = [];
 
-
-	theCanvas = document.getElementById("gamescreen");
-	ctx = theCanvas.getContext("2d");
-	
-	ctx.canvas.height  = window.innerHeight-5;
-	ctx.canvas.width = ctx.canvas.height;
-	
-	window.addEventListener("resize", initApp);
-	window.addEventListener("orientationchange", initApp);
-	theCanvas.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mousedown", mouseDownHandler);
-
-	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
-
 	initGrid();
 	allRooms = [];
 	path = [];
@@ -512,16 +526,29 @@ function initApp()
 	possibleOgresAndTraps = [];
 	unblockedRooms = [];
 	allPlayers = [];
+	
+	theCanvas = document.getElementById("gamescreen");
+	ctx = theCanvas.getContext("2d");
+	
+	initCanvas();
+	
+	window.addEventListener("resize", initApp);
+	window.addEventListener("orientationchange", initApp);
+	window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousedown", mouseDownHandler);
+
 	initUnblockedRooms();
 	initPossibles();
 	initializeRooms();
 	placeOgresAndTraps();
 	addOgresAndTrapsToRooms();
+	
 	generatePath();
 	initPlayers();
 	initTokens();
 	startGame();
 	draw();
+	
 
 }
 
@@ -537,20 +564,7 @@ function drawClippedAsset(sx,sy,swidth,sheight,x,y,w,h,imageId)
 function draw() {
 	
 	
-	// the -5 in the two following lines makes the canvas area, just slightly smaller
-	// than the entire window.  this helps so the scrollbars do not appear.
-	ctx.canvas.height  = window.innerHeight-5;
-	ctx.canvas.width = ctx.canvas.height;
-	ctx.strokeStyle = '#0000ff';
-	
-	ctx.font = '10px sans-serif';
-	
-	var textOut = "Height: " + ctx.canvas.height + "\n";
-
-	textOut += "Width: " + ctx.canvas.width + "\n";
-
-	ctx.globalAlpha = 1;
-	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
+	initCanvas();
 
 	for (var lineCount=0;lineCount<MAX_COLS;lineCount++)
 	{
@@ -660,26 +674,30 @@ function handleMouseMove(e)
     {    
         if (hoverItem.isMoving)
         {
-			var tempx = e.clientX - hoverItem.offSetX;
-			var tempy = e.clientY - hoverItem.offSetY;
-			hoverItem.gridLocation.x = tempx;
-			hoverItem.gridLocation.y = tempy;
-			 if (tempx < 0)
+			var hoverItemPoint = getMousePos(e);
+			hoverItem.gridLocation.x = hoverItemPoint.x - hoverItem.offSetX;
+			hoverItem.gridLocation.y = hoverItemPoint.y - hoverItem.offSetY;
+			
+			//45 on next line is width/height of each token - needs to be variable later
+			var maxGridLocation = lineInterval * (MAX_COLS) -45;
+			
+			 if (hoverItemPoint.x < 0)
 			  {
 				hoverItem.gridLocation.x = 0;
 			  }
-			  if (tempx + lineInterval > 650)
+			  if (hoverItemPoint.x >= maxGridLocation)
 			  {
-				hoverItem.gridLocation.x = 650 - lineInterval;
+				console.log(hoverItemPoint);
+				hoverItem.gridLocation.x = maxGridLocation;
 			  }
-			  if (tempy < 0)
+			  if (hoverItemPoint.y < 0)
 			  { 
 				hoverItem.gridLocation.y = 0;
 			  }
-			  if (lineInterval + tempy > 650)
+			  if (hoverItemPoint.y >= maxGridLocation)
 			  {
-				hoverItem.gridLocation.y = 650 - lineInterval;
-			  }
+				hoverItem.gridLocation.y = maxGridLocation;
+			  } 
         }
         draw();
     }
@@ -690,7 +708,7 @@ function handleMouseMove(e)
 		for (x = 0; x < allPlayers.length;x++){
 			playerTokens.push(allPlayers[x].token);
 		}
-        hoverToken = hitTestHoverItem({x:e.clientX,y:e.clientY}, playerTokens);
+        hoverToken = hitTestHoverItem(getMousePos(e), playerTokens);
         draw();
     }
 }
@@ -745,6 +763,8 @@ function hitTest(mouseLocation, hitTestObject)
   return false;
 }
 
+
+
 var point = function(x,y)
 {
 this.x = x;
@@ -773,7 +793,6 @@ function startGame(){
 	allPlayers[3].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1), y:lineInterval * (allRooms[roomNumber].row-1)+(lineInterval/2)}
 	//leader
 	allPlayers[4].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1) + lineInterval - 45, y:lineInterval * (allRooms[roomNumber].row-1)+(lineInterval/2)}
-	
 	
 }
 
@@ -813,6 +832,25 @@ var currentPoint = getMousePos(event);
 		break;
 	  }
 	}
+}
+
+function stopClock(){
+	clearInterval(gameclockHandle);
+}
+
+
+function updateGameClock(){
+	var el = document.getElementById("gameclock");
+	gameclockSecondCounter++;
+	el.innerHTML = gameclockSecondCounter;
+}
+
+function hitTestRoom(){
+	allRooms[0]
+}
+
+function canPlayerMoveHere(movedPlayer){
+	movedPlayer.token.gridLocation.x
 }
 
 function mouseUpHandler()

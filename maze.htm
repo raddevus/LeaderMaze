@@ -10,6 +10,10 @@
 <body>
 <img style="visibility:hidden;display:none;" src="assets/characters.png" id="characterSet1" />
 <img style="visibility:hidden;display:none;" src="assets/characters1.png" id="characterSet2" />
+<div id="scoreboard">
+<div id="gameclock"></div>
+</div>
+<hr/>
 <canvas id="gamescreen">You're browser does not support HTML5.</canvas>
 <div id="genPathButton">
 <div>
@@ -21,6 +25,10 @@
 <div>
 <button  class="buttonPads" onclick="retryUntilSolved()">Auto-Solve</button>
 </div>
+<div>
+<button class="buttonPads" onclick="stopClock()">Stop Clock</button>
+</div>
+
 <div>
 <input id="maxCols" type="number"  value="6" autocomplete="off" min="4">
 </div>
