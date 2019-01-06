@@ -16,6 +16,7 @@ var allPlayers = [];
 var hoverItem = null;
 var gameclockSecondCounter = 0;
 var gameclockHandle = null;
+var playerIdxMovingToken = -1;
 
 // we have a scoreboard that takes up the top 50px so 
 // the canvas is always offset by 50px (value is set up in css scoreboard element)
@@ -820,6 +821,7 @@ var currentPoint = getMousePos(event);
 	{
 	  if (hitTest(currentPoint, allPlayers[tokenCount].token))
 	  {
+		playerIdxMovingToken = tokenCount;
 		currentToken = allPlayers[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
@@ -865,6 +867,28 @@ function hitTestRoom(player){
 	return null;
 }
 
+function handlePlayerMovement(room, player){
+	console.log(player.characterType + " moved into room " + room.location);
+	if (room.hasOgre){
+		if (player.characterType != "barbarian"){
+			console.log("An ogre leaps on you and kills you! " +  player.characterType + " is dead.");
+		}
+		else{
+			console.log("You barbarian! You've killed an ogre.");
+		}
+	}
+	
+	if (room.hasTrap){
+		if (player.characterType != "thief"){
+			console.log(player.characterType + " has sprung a trap! "  +  player.characterType + " is dead.");
+		}
+		else{
+			console.log("You thief! You've disarmed a trap.");
+		}
+	}
+	
+}
+
 function mouseUpHandler()
 {
 	if (mouseIsCaptured)
@@ -875,9 +899,16 @@ function mouseUpHandler()
 	for (var j = 0; j < allPlayers.length;j++)
 	{
 		allPlayers[j].token.isMoving = false;
+		
 	}
 	window.removeEventListener("mousemove", mouseDownHandler);
 	window.removeEventListener("mouseup", mouseUpHandler);
+	
+	var actionRoom = hitTestRoom(allPlayers[playerIdxMovingToken]);
+	handlePlayerMovement(actionRoom, allPlayers[playerIdxMovingToken]);
+	playerIdxMovingToken = -1;
+	
+	
 }
 
 function getMousePos(evt) {
