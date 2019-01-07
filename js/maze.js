@@ -885,26 +885,30 @@ function handlePlayerMovement(room, player){
 		output.innerHTML += "  You've won!";
 	}
 	if (room.hasOgre){
-		if (player.characterType != "barbarian"){
+		if (player.characterType == "barbarian" && player.hasSpecialAbility){
+			output.innerHTML += " You barbarian! You've killed an ogre. Beware! You will not survive the next ogre you meet.";
+			room.hasOgre = false;
+			player.hasSpecialAbility = false;
+		}
+		else{
 			output.innerHTML += "  An ogre leaps on you and kills you! " +  player.characterType + " is dead.";
 			setPlayerDead(player);
 			draw();
-		}
-		else{
-			output.innerHTML += " You barbarian! You've killed an ogre.";
-			room.hasOgre = false;
+
 		}
 	}
 	
 	if (room.hasTrap){
-		if (player.characterType != "thief"){
+		if (player.characterType == "thief" && player.hasSpecialAbility){
+			output.innerHTML += "  You thief! You've disarmed a trap.  Beware! You will not survive the next trap you find.";
+			room.hasTrap = false;
+			player.hasSpecialAbility = false;
+		}
+		else{
 			output.innerHTML +=  "  " + player.characterType + " has sprung a trap! "  +  player.characterType + " is dead.";
 			setPlayerDead(player);
 			draw();
-		}
-		else{
-			output.innerHTML += "  You thief! You've disarmed a trap.";
-			room.hasTrap = false;
+			
 		}
 	}
 	
