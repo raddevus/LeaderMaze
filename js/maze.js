@@ -17,7 +17,8 @@ var allGameItems = [];
 var hoverItem = null;
 var gameclockSecondCounter = 0;
 var gameclockHandle = null;
-var playerIdxMovingToken = -1;
+var playerTokenIdx = -1;
+var gameItemTokenIdx = -1;
 
 // we have a scoreboard that takes up the top 50px so 
 // the canvas is always offset by 50px (value is set up in css scoreboard element)
@@ -319,7 +320,10 @@ function getColumnNumber(location){
 
 function room(roomInfo){
 	// location is a value from 1 to MAX_COLS
-	this.location = roomInfo.location;
+	if (roomInfo != undefined && roomInfo != null){
+		//console.log("roomInfo.location : " + roomInfo.location);
+		this.location = roomInfo.location;
+	}
 	// we will use visited to determine if user has already been in this room
 	// room 1 is always initially visited since that is where user starts
 	this.visited = this.location == 1 ? true : false;
@@ -512,6 +516,8 @@ function initApp()
 	allRooms = [];
 	possibleOgresAndTraps = [];
 	allGameItems = [];
+	playerTokenIdx = -1;
+	gameItemTokenIdx = -1;
 	pathIndexer = 0;
 	unblockedRooms = [];
 	currentRoom = null;
@@ -540,7 +546,7 @@ function initApp()
 	
 	initCanvas();
 	
-	window.addEventListener("resize", initApp);
+	//window.addEventListener("resize", initApp);
 	window.addEventListener("orientationchange", initApp);
 	window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mousedown", mouseDownHandler);
@@ -699,6 +705,7 @@ function token(userToken){
 function item(initData){
 	this.isAvailable = initData.isAvailable;
 	this.token = initData.token;
+	this.type = initData.type;
 	this.setToken = function (token){
 		this.token = token;
 	};
@@ -839,8 +846,8 @@ function initPlayers(){
 }
 
 function initGameItems(){
-	allGameItems.push(new item({isAvailable: true, token: new token()}));
-	allGameItems.push(new item({isAvailable: true, token: new token()}));
+	allGameItems.push(new item({type:"greater", isAvailable: true, token: new token()}));
+	allGameItems.push(new item({type:"sniff",isAvailable: true, token: new token()}));
 }
 
 function startGame(){
@@ -882,7 +889,8 @@ var currentPoint = getMousePos(event);
 	{
 	  if (hitTest(currentPoint, allPlayers[tokenCount].token))
 	  {
-		playerIdxMovingToken = tokenCount;
+		// playerItemTokenIdx > -1 means that a player item is being dragged around
+		playerTokenIdx = tokenCount;
 		currentToken = allPlayers[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
@@ -895,14 +903,15 @@ var currentPoint = getMousePos(event);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		mouseIsCaptured = true;
 		window.addEventListener("mouseup",mouseUpHandler);
-		break;
+		return;
 	  }
 	}
 	for (var tokenCount = allGameItems.length-1;tokenCount >=0;tokenCount--)
 	{
 	  if (hitTest(currentPoint, allGameItems[tokenCount].token))
 	  {
-		playerIdxMovingToken = tokenCount;
+		// gameItemTokenIdx > -1 means that a game item is being dragged around
+		gameItemTokenIdx = tokenCount;
 		currentToken = allGameItems[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
@@ -915,7 +924,7 @@ var currentPoint = getMousePos(event);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		mouseIsCaptured = true;
 		window.addEventListener("mouseup",mouseUpHandler);
-		break;
+		return;
 	  }
 	}
 }
@@ -958,9 +967,13 @@ function setPlayerDead(player){
 	}
 }
 
-function handlePlayerMovement(room, player){
+function handlePlayerMovement(playerTokenIdx){
 	var output = document.getElementById("output");
-	
+	var player = allPlayers[playerTokenIdx];
+	room = hitTestRoom(player);
+	if (room == null) { 
+		return; // couldn't get room -- this is because of current issue with landing between rooms.
+	}
 	output.innerHTML = player.characterType + " moved into room " + room.location;
 	if (room.location == GRID_SIZE){
 		output.innerHTML += "  You've won!";
@@ -1000,6 +1013,21 @@ function handlePlayerMovement(room, player){
 	
 }
 
+function handleGameItemDrop(tokenIdx){
+	var gameItem = allGameItems[tokenIdx];
+	var actionRoom = hitTestRoom(gameItem);
+	if (actionRoom == null){
+		return; // couldn't get valid room due to other bad code
+	}
+	if (gameItem.type == "sniff"){
+		output.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
+	}
+	if (gameItem.type == "greater"){
+		output.innerHTML = "The wizard has just cast a greater knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
+	}
+	
+}
+
 function mouseUpHandler()
 {
 	if (mouseIsCaptured)
@@ -1015,9 +1043,14 @@ function mouseUpHandler()
 	window.removeEventListener("mousemove", mouseDownHandler);
 	window.removeEventListener("mouseup", mouseUpHandler);
 	
-	var actionRoom = hitTestRoom(allPlayers[playerIdxMovingToken]);
-	handlePlayerMovement(actionRoom, allPlayers[playerIdxMovingToken]);
-	playerIdxMovingToken = -1;
+	if (playerTokenIdx > -1){
+		handlePlayerMovement(playerTokenIdx);
+		playerTokenIdx = -1;
+	}
+	if (gameItemTokenIdx > -1){
+		handleGameItemDrop(gameItemTokenIdx);
+		gameItemTokenIdx = -1;
+	}
 }
 
 function getMousePos(evt) {
