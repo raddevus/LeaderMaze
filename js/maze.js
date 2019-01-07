@@ -13,7 +13,7 @@ possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
 var allPlayers = [];
-var allItems = [];
+var allGameItems = [];
 var hoverItem = null;
 var gameclockSecondCounter = 0;
 var gameclockHandle = null;
@@ -511,6 +511,7 @@ function initApp()
 	rows = [];
 	allRooms = [];
 	possibleOgresAndTraps = [];
+	allGameItems = [];
 	pathIndexer = 0;
 	unblockedRooms = [];
 	currentRoom = null;
@@ -552,9 +553,12 @@ function initApp()
 	
 	generatePath();
 	initPlayers();
-	initTokens(45,60,allPlayers.length,allPlayers);
+	initTokens(45,60,allPlayers.length,"characterSet1",allPlayers);
+	initGameItems();
+	initTokens(30,30,allGameItems.length,"items",allGameItems);
 	startGame();
 	draw();
+	drawGameItems();
 	
 
 }
@@ -566,6 +570,42 @@ function drawClippedAsset(sx,sy,swidth,sheight,x,y,w,h,imageId)
 	{
 		ctx.drawImage(img,sx,sy,swidth,sheight,x,y,w,h);
 	}
+}
+
+function drawGameItems(){
+	
+    for (var tokenCount = 0; tokenCount < allGameItems.length; tokenCount++) {
+		drawClippedAsset(
+			allGameItems[tokenCount].token.imgSourceX,
+			allGameItems[tokenCount].token.imgSourceY,
+			allGameItems[tokenCount].token.imgSourceSize,
+			allGameItems[tokenCount].token.imgSourceSize,
+			allGameItems[tokenCount].token.gridLocation.x,
+			allGameItems[tokenCount].token.gridLocation.y,
+			allGameItems[tokenCount].token.size,
+			allGameItems[tokenCount].token.size,
+			allGameItems[tokenCount].token.imgIdTag
+		);
+    }
+	// if the mouse is hovering over the location of a token, show yellow highlight
+    if (hoverToken !== null) {
+        ctx.fillStyle = "yellow";
+        ctx.globalAlpha = .5
+        ctx.fillRect(hoverToken.gridLocation.x, hoverToken.gridLocation.y, 
+                  hoverToken.size, hoverToken.size);
+        ctx.globalAlpha = 1;
+		drawClippedAsset(
+			hoverToken.imgSourceX,
+			hoverToken.imgSourceY,
+			hoverToken.imgSourceSize,
+			hoverToken.imgSourceSize,
+			hoverToken.gridLocation.x,
+			hoverToken.gridLocation.y,
+			hoverToken.size,
+			hoverToken.size,
+			hoverToken.imgIdTag
+		);
+    }
 }
 
 function draw() {
@@ -659,9 +699,12 @@ function token(userToken){
 function item(initData){
 	this.isAvailable = initData.isAvailable;
 	this.token = initData.token;
+	this.setToken = function (token){
+		this.token = token;
+	};
 }
 
-function initTokens(iconSize,sizeInBitmap,iconCount,targetArray){
+function initTokens(iconSize,sizeInBitmap,iconCount,imageIdTag,targetArray){
 	var currentToken =null;
 	// add a token to each player
 	for (var i = 0; i < iconCount;i++)
@@ -671,7 +714,7 @@ function initTokens(iconSize,sizeInBitmap,iconCount,targetArray){
 				imgSourceX:i*sizeInBitmap,
 				imgSourceY:0*sizeInBitmap,
 				imgSourceSize:sizeInBitmap,
-				imgIdTag:'characterSet1',
+				imgIdTag:imageIdTag,
 				gridLocation: new gridlocation({x:i*iconSize,y:iconCount*iconSize})
 			});
 			targetArray[i].setToken(currentToken);
@@ -709,6 +752,7 @@ function handleMouseMove(e)
 			  } 
         }
         draw();
+		drawGameItems();
     }
     // otherwise user is just moving mouse / highlight tokens
     else
@@ -719,6 +763,12 @@ function handleMouseMove(e)
 		}
         hoverToken = hitTestHoverItem(getMousePos(e), playerTokens);
         draw();
+		var itemTokens = [];
+		for (x = 0; x < allGameItems.length;x++){
+			itemTokens.push(allGameItems[x].token);
+		}
+        hoverToken = hitTestHoverItem(getMousePos(e), itemTokens);
+		drawGameItems();
     }
 }
 
@@ -788,6 +838,11 @@ function initPlayers(){
 	allPlayers.push (new player({characterType: "leader", hasAbility: false, token: new token()})); 
 }
 
+function initGameItems(){
+	allGameItems.push(new item({isAvailable: true, token: new token()}));
+	allGameItems.push(new item({isAvailable: true, token: new token()}));
+}
+
 function startGame(){
 	var roomNumber = 0;
 	// barbarian
@@ -837,6 +892,26 @@ var currentPoint = getMousePos(event);
 		currentToken.idx = tokenCount;
 		hoverItem = currentToken;
 		allPlayers[tokenCount].setToken(currentToken);
+		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
+		mouseIsCaptured = true;
+		window.addEventListener("mouseup",mouseUpHandler);
+		break;
+	  }
+	}
+	for (var tokenCount = allGameItems.length-1;tokenCount >=0;tokenCount--)
+	{
+	  if (hitTest(currentPoint, allGameItems[tokenCount].token))
+	  {
+		playerIdxMovingToken = tokenCount;
+		currentToken = allGameItems[tokenCount].token;
+		// the offset value is the diff. between the place inside the barricade
+		// where the user clicked and the barricade's xy origin.
+		currentToken.offSetX = currentPoint.x - currentToken.gridLocation.x;
+		currentToken.offSetY = currentPoint.y - currentToken.gridLocation.y;
+		currentToken.isMoving = true;
+		currentToken.idx = tokenCount;
+		hoverItem = currentToken;
+		allGameItems[tokenCount].setToken(currentToken);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		mouseIsCaptured = true;
 		window.addEventListener("mouseup",mouseUpHandler);
