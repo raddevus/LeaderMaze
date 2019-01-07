@@ -775,11 +775,11 @@ this.y = y;
 };
 
 function initPlayers(){
-	allPlayers.push (new player({characterType: "barbarian", token: new token()})); 
-	allPlayers.push (new player({characterType: "wizard", token: new token()})); 
-	allPlayers.push (new player({characterType: "thief", token: new token()})); 
-	allPlayers.push (new player({characterType: "elf", token: new token()})); 
-	allPlayers.push (new player({characterType: "leader", token: new token()})); 
+	allPlayers.push (new player({characterType: "barbarian", hasAbility: true, token: new token()})); 
+	allPlayers.push (new player({characterType: "wizard", hasAbility: false, token: new token()})); 
+	allPlayers.push (new player({characterType: "thief", hasAbility: true, token: new token()})); 
+	allPlayers.push (new player({characterType: "elf", hasAbility: false, token: new token()})); 
+	allPlayers.push (new player({characterType: "leader", hasAbility: false, token: new token()})); 
 }
 
 function startGame(){
@@ -802,6 +802,7 @@ function startGame(){
 var player = function (initData){
 	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
 	this.characterType = initData.characterType;
+	this.hasSpecialAbility = initData.hasAbility;
 	this.token = initData.token;
 	this.setToken = function (token){
 		this.token = token;
