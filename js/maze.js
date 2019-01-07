@@ -13,6 +13,7 @@ possibleOgresAndTraps = [];
 var pathIndexer = 0;
 var unblockedRooms = [];
 var allPlayers = [];
+var allItems = [];
 var hoverItem = null;
 var gameclockSecondCounter = 0;
 var gameclockHandle = null;
@@ -551,7 +552,7 @@ function initApp()
 	
 	generatePath();
 	initPlayers();
-	initTokens();
+	initTokens(45,60,allPlayers.length,allPlayers);
 	startGame();
 	draw();
 	
@@ -655,20 +656,25 @@ function token(userToken){
 	}
 }
 
-function initTokens(){
+function item(initData){
+	this.isAvailable = initData.isAvailable;
+	this.token = initData.token;
+}
+
+function initTokens(iconSize,sizeInBitmap,iconCount,targetArray){
 	var currentToken =null;
 	// add a token to each player
-	for (var i = 0; i < 5;i++)
+	for (var i = 0; i < iconCount;i++)
 	{
 		currentToken = new token({
-				size:45,
-				imgSourceX:i*60,
-				imgSourceY:0*60,
-				imgSourceSize:60,
+				size:iconSize,
+				imgSourceX:i*sizeInBitmap,
+				imgSourceY:0*sizeInBitmap,
+				imgSourceSize:sizeInBitmap,
 				imgIdTag:'characterSet1',
-				gridLocation: new gridlocation({x:i*45,y:5*45})
+				gridLocation: new gridlocation({x:i*iconSize,y:iconCount*iconSize})
 			});
-			allPlayers[i].setToken(currentToken);
+			targetArray[i].setToken(currentToken);
 	}
 }
 
