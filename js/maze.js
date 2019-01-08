@@ -4,27 +4,33 @@ var n = 0;
 var s = 1;
 var e = 2;
 var w = 3;
-var ogres = [];
-var traps = [];
-var cols = [];
-var rows = [];
-var allRooms = [];
-possibleOgresAndTraps = [];
-var pathIndexer = 0;
-var unblockedRooms = [];
-var allPlayers = [];
+
 var allGameItems = [];
-var hoverItem = null;
+var allPlayers = [];
+var allRooms = [];
+var cols = [];
+var ogres = [];
+var path = [];
+var possibleOgresAndTraps = [];
+var rows = [];
+var traps = [];
+var unblockedRooms = [];
+
+var pathIndexer = 0;
+// hoverToken -- token being hovered over with mouse
+var hoverToken = null;
+
+
 var gameclockSecondCounter = 0;
 var gameclockHandle = null;
+
 var playerTokenIdx = -1;
 var gameItemTokenIdx = -1;
 
 // we have a scoreboard that takes up the top 50px so 
 // the canvas is always offset by 50px (value is set up in css scoreboard element)
 var gridTopOffset = 50;
-// hoverToken -- token being hovered over with mouse
-var hoverToken = null;
+
 var currentRoom = null;
 var maxColElement = document.getElementById("maxCols");
 var challengesCheck = document.getElementById("challengesCheck");
@@ -34,9 +40,9 @@ var GRID_SIZE = MAX_COLS*MAX_COLS;
 var PREV_COL_SIZE = MAX_COLS;
 var MAX_ATTEMPTS = 500;
 var MAX_OGRES_TRAPS = 5;
-var attempts = 0;
+var solutionAttempts = 0;
 // path is an array of rooms used by generatePath()
-var path = [];
+
 var ctx = null;
 var theCanvas = null;
 var lineInterval = 0;
@@ -455,24 +461,24 @@ function retryUntilSolved(){
 			reGenPath();
 			return;
 	}
-	attempts = 0;
-	while (attempts < MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
+	solutionAttempts = 0;
+	while (solutionAttempts < MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
 		path= [];
 		initPossibles();
 		initializeRooms();
 		addOgresAndTrapsToRooms();
 		generatePath();
 		draw();
-		console.log("attempts : " + attempts++);
+		console.log("solutionAttempts : " + solutionAttempts++);
 	}
 	setTimeout(displayResults,1300);
 }
 
 function displayResults(){
-	if (attempts <= MAX_ATTEMPTS && currentRoom.location == GRID_SIZE){
-		alert ("Solved it in " + attempts + " attempts.");
+	if (solutionAttempts <= MAX_ATTEMPTS && currentRoom.location == GRID_SIZE){
+		alert ("Solved it in " + solutionAttempts + " solutionAttempts.");
 	}
-	if (attempts >=MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
+	if (solutionAttempts >=MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
 		alert("Most likely, this map is unsolvable.");
 	}
 	
@@ -529,7 +535,7 @@ function initApp()
 	PREV_COL_SIZE = MAX_COLS;
 	MAX_ATTEMPTS = 500;
 	MAX_OGRES_TRAPS = 5;
-	attempts = 0;
+	solutionAttempts = 0;
 	// path is an array of rooms used by generatePath()
 	path = [];
 
