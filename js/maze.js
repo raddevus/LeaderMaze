@@ -644,8 +644,9 @@ function initPlayers(){
 }
 
 function initGameItems(){
-	gameVars.allGameItems.push(new gameItem({type:"greater", token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"lesser", token: new token()}));
 	gameVars.allGameItems.push(new gameItem({type:"sniff", token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"greater", token: new token()}));
 }
 
 function setPlayerStartPositions(){
@@ -770,6 +771,10 @@ function setPlayerDead(player){
 			if (player.characterType == "elf"){
 				removeGameItem("sniff");
 			}
+			if (player.characterType == "wizard"){
+				removeGameItem("lesser");
+				removeGameItem("greater");
+			}
 			return;
 		}
 	}
@@ -832,8 +837,15 @@ function gameItemDropHandler(tokenIdx){
 		gameItem.sniff(actionRoom);
 	}
 	if (gameItem.type == "greater"){
-		output.innerHTML = "The wizard has just cast a greater knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
+		output.innerHTML = "The wizard has just cast a GREATER knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
+		removeGameItem(gameItem.type);
 	}
+	
+	if (gameItem.type == "lesser"){
+		output.innerHTML = "The wizard has just cast a LESSER knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
+		removeGameItem(gameItem.type);
+	}
+
 }
 
 function mouseUpHandler()
