@@ -1,103 +1,52 @@
 // maze.js
 
-var n = 0;
-var s = 1;
-var e = 2;
-var w = 3;
-
-var allGameItems = [];
-var allPlayers = [];
-var allRooms = [];
-var cols = [];
-var ogres = [];
-var path = [];
-var possibleOgresAndTraps = [];
-var rows = [];
-var traps = [];
-var unblockedRooms = [];
-
-var pathIndexer = 0;
-// hoverToken -- token being hovered over with mouse
-var hoverToken = null;
-
-
-var gameclockSecondCounter = 0;
-var gameclockHandle = null;
-
-var playerTokenIdx = -1;
-var gameItemTokenIdx = -1;
-
-// we have a scoreboard that takes up the top 50px so 
-// the canvas is always offset by 50px (value is set up in css scoreboard element)
-var gridTopOffset = 50;
-
-var currentRoom = null;
-var maxColElement = document.getElementById("maxCols");
-var challengesCheck = document.getElementById("challengesCheck");
-var isChallengesDisplayed = true;
-var MAX_COLS = Number(maxColElement.value);
-var GRID_SIZE = MAX_COLS*MAX_COLS;
-var PREV_COL_SIZE = MAX_COLS;
-var MAX_ATTEMPTS = 500;
-var MAX_OGRES_TRAPS = 5;
-var solutionAttempts = 0;
-// path is an array of rooms used by generatePath()
-
-var ctx = null;
-var theCanvas = null;
-var lineInterval = 0;
-
-var mouseIsCaptured = false;
-
-console.log("before initapp...");
-window.addEventListener("load", initApp);
-console.log("after window.addEventListener(load, initApp)");
+window.addEventListener("load",initApp);
 
 function initGrid(){
-	PREV_COL_SIZE = MAX_COLS;
-	MAX_COLS = Number(maxColElement.value);
-	GRID_SIZE = MAX_COLS*MAX_COLS;
+	gameVars.PREV_COL_SIZE = gameVars.MAX_COLS;
+	gameVars.MAX_COLS = Number(gameVars.maxColElement.value);
+	gameVars.GRID_SIZE = gameVars.MAX_COLS*gameVars.MAX_COLS;
 	initCols();
 	initRows();
 }
 
 
 function initCols(){
-	cols=[];
-	for (x = 0; x< MAX_COLS;x++){
-		cols.push(MAX_COLS*(x+1));
+	gameVars.cols=[];
+	for (x = 0; x< gameVars.MAX_COLS;x++){
+		gameVars.cols.push(gameVars.MAX_COLS*(x+1));
 	}
 }
 
 
 function initRows(){
-	rows=[];
-	for (x = 0; x< MAX_COLS +1;x++){
-		rows.push(MAX_COLS*x+1);
+	gameVars.rows=[];
+	for (x = 0; x< gameVars.MAX_COLS +1;x++){
+		gameVars.rows.push(gameVars.MAX_COLS*x+1);
 	}
 }
 
 function initPossibles(){
-	// location 1 and GRID_SIZE are off limits
+	// location 1 and gameVars.GRID_SIZE are off limits
 	// since they are the enter and exit rooms
-	for (x = 2; x < GRID_SIZE; x++){
-		possibleOgresAndTraps.push(x);
+	for (x = 2; x < gameVars.GRID_SIZE; x++){
+		gameVars.possibleOgresAndTraps.push(x);
 	}
 }
 
 function drawPathSteps(){
-	ctx.strokeStyle = "darkorange";
-	ctx.beginPath();
-	ctx.lineWidth = 2;
-	if (pathIndexer < path.length -1){
-		ctx.moveTo(path[pathIndexer].textLocationX,path[pathIndexer].textLocationY);
-		ctx.lineTo(path[pathIndexer+1].textLocationX,path[pathIndexer+1].textLocationY);
-		ctx.stroke();
-		pathIndexer++;
+	gameVars.ctx.strokeStyle = "darkorange";
+	gameVars.ctx.beginPath();
+	gameVars.ctx.lineWidth = 2;
+	if (gameVars.pathIndexer < gameVars.path.length -1){
+		gameVars.ctx.moveTo(gameVars.path[gameVars.pathIndexer].textLocationX,gameVars.path[gameVars.pathIndexer].textLocationY);
+		gameVars.ctx.lineTo(gameVars.path[gameVars.pathIndexer+1].textLocationX,gameVars.path[gameVars.pathIndexer+1].textLocationY);
+		gameVars.ctx.stroke();
+		gameVars.pathIndexer++;
 		setTimeout(drawPathSteps,100);
 	}
 	else{
-		pathIndexer = 0;
+		gameVars.pathIndexer = 0;
 	}
 	
 }
@@ -107,51 +56,51 @@ function drawPath(){
 }
 
 function placeOgresAndTraps(){
-	ogres = [];
-	traps = [];
+	gameVars.ogres = [];
+	gameVars.traps = [];
 	// ###  NOTES #########
 	// An ogre and trap can never be in locations 30 & 35 (blocks exit) or
 	// 2 and 7 (blocks entrance). 
 	// ####################
 
-	while (ogres.length < MAX_OGRES_TRAPS){ 
-		var possibleOgre = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
-		ogres.push(possibleOgre);
-		if (possibleOgre == unblockedRooms[0] || possibleOgre == unblockedRooms[1]){
-			if (possibleOgre - unblockedRooms[0] == 0){
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[1]),1);
+	while (gameVars.ogres.length < gameVars.MAX_OGRES_TRAPS){ 
+		var possibleOgre = gameVars.possibleOgresAndTraps.splice(Math.floor((Math.random() * gameVars.possibleOgresAndTraps.length)),1);
+		gameVars.ogres.push(possibleOgre);
+		if (possibleOgre == gameVars.unblockedRooms[0] || possibleOgre == gameVars.unblockedRooms[1]){
+			if (possibleOgre - gameVars.unblockedRooms[0] == 0){
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[1]),1);
 			}
 			else{
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[0]),1);
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[0]),1);
 			}
 		}
-		if (possibleOgre == unblockedRooms[2] || possibleOgre == unblockedRooms[3]){
-			if (possibleOgre - unblockedRooms[2] == 0){
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[3]),1);
+		if (possibleOgre == gameVars.unblockedRooms[2] || possibleOgre == gameVars.unblockedRooms[3]){
+			if (possibleOgre - gameVars.unblockedRooms[2] == 0){
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[3]),1);
 			}
 			else{
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[2]),1);
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[2]),1);
 			}
 		}
 	}
 
-	while (traps.length < MAX_OGRES_TRAPS){
-		var possibleTrap = possibleOgresAndTraps.splice(Math.floor((Math.random() * possibleOgresAndTraps.length)),1);
-		traps.push(possibleTrap);
-		if (possibleTrap == unblockedRooms[0] || possibleTrap == unblockedRooms[1]){
-			if (possibleTrap - unblockedRooms[0] == 0){
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[1]),1);
+	while (gameVars.traps.length < gameVars.MAX_OGRES_TRAPS){
+		var possibleTrap = gameVars.possibleOgresAndTraps.splice(Math.floor((Math.random() * gameVars.possibleOgresAndTraps.length)),1);
+		gameVars.traps.push(possibleTrap);
+		if (possibleTrap == gameVars.unblockedRooms[0] || possibleTrap == gameVars.unblockedRooms[1]){
+			if (possibleTrap - gameVars.unblockedRooms[0] == 0){
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[1]),1);
 			}
 			else{
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[0]),1);
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[0]),1);
 			}
 		}
-		if (possibleTrap == unblockedRooms[2] || possibleTrap == unblockedRooms[3]){
-			if (possibleTrap - unblockedRooms[2] == 0){
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[3]),1);
+		if (possibleTrap == gameVars.unblockedRooms[2] || possibleTrap == gameVars.unblockedRooms[3]){
+			if (possibleTrap - gameVars.unblockedRooms[2] == 0){
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[3]),1);
 			}
 			else{
-				possibleOgresAndTraps.splice(possibleOgresAndTraps.indexOf(unblockedRooms[2]),1);
+				gameVars.possibleOgresAndTraps.splice(gameVars.possibleOgresAndTraps.indexOf(gameVars.unblockedRooms[2]),1);
 			}
 		}
 	} 
@@ -159,71 +108,71 @@ function placeOgresAndTraps(){
 }
 
 function addOgresAndTrapsToRooms(){
-	for (o = 0; o < ogres.length; o++){
-		allRooms[ogres[o]-1].hasOgre = true;
+	for (o = 0; o < gameVars.ogres.length; o++){
+		gameVars.allRooms[gameVars.ogres[o]-1].hasOgre = true;
 	}
-	for (t = 0; t < traps.length; t++){
-		allRooms[traps[t]-1].hasTrap = true;
+	for (t = 0; t < gameVars.traps.length; t++){
+		gameVars.allRooms[gameVars.traps[t]-1].hasTrap = true;
 	}
 
 }
 
 function drawTrapsAndOgres(){
-	if (!isChallengesDisplayed){
+	if (!gameVars.isChallengesDisplayed){
 		// user has turned off the display of challengesCheck
 		return;
 	}
 	// DRAW TRAPS
-	ctx.globalAlpha = .5;
-	ctx.fillStyle = "red";
-	for(x = 0; x < traps.length; x++){
+	gameVars.ctx.globalAlpha = .5;
+	gameVars.ctx.fillStyle = "red";
+	for(x = 0; x < gameVars.traps.length; x++){
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
-		ctx.fillRect(allRooms[traps[x]-1].textLocationX,allRooms[traps[x]-1].textLocationY+5,15,15);
+		gameVars.ctx.fillRect(gameVars.allRooms[gameVars.traps[x]-1].textLocationX,gameVars.allRooms[gameVars.traps[x]-1].textLocationY+5,15,15);
 	}
 	
-	// DRAW OGRES
+	// DRAW gameVars.ogres
 	
-	ctx.fillStyle = "darkgreen";
-	ctx.strokeStyle = '#003300';
-	ctx.lineWidth = 1;
-	for(x = 0; x < ogres.length; x++){
+	gameVars.ctx.fillStyle = "darkgreen";
+	gameVars.ctx.strokeStyle = '#003300';
+	gameVars.ctx.lineWidth = 1;
+	for(x = 0; x < gameVars.ogres.length; x++){
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
-		ctx.beginPath();	
-		ctx.arc(allRooms[ogres[x]-1].textLocationX,allRooms[ogres[x]-1].textLocationY +8, 7, 0, 2 * Math.PI, false);
-		ctx.fillStyle = 'green';
-		ctx.fill();
-		ctx.stroke();
+		gameVars.ctx.beginPath();	
+		gameVars.ctx.arc(gameVars.allRooms[gameVars.ogres[x]-1].textLocationX,gameVars.allRooms[gameVars.ogres[x]-1].textLocationY +8, 7, 0, 2 * Math.PI, false);
+		gameVars.ctx.fillStyle = 'green';
+		gameVars.ctx.fill();
+		gameVars.ctx.stroke();
 	}
-	ctx.globalAlpha = 1;
+	gameVars.ctx.globalAlpha = 1;
 }
 
 function generatePath(){
 	
 	var roomIndex = 0;
-	currentRoom = allRooms[roomIndex];
-	currentRoom.isPath = true;
+	gameVars.currentRoom = gameVars.allRooms[roomIndex];
+	gameVars.currentRoom.isPath = true;
 	// we always push room 1 on first since that is always where we start.
-	path.push(currentRoom);
+	gameVars.path.push(gameVars.currentRoom);
 	var counter = 0;
 	
 	// Requirement is that the room cannot be added to the path if it has already been added
 		
-	while (currentRoom.location != GRID_SIZE && counter < GRID_SIZE * 3){
+	while (gameVars.currentRoom.location != gameVars.GRID_SIZE && counter < gameVars.GRID_SIZE * 3){
 		counter++;
 		// determine which way to exit from possible exits (doors)
-		var doorIndex = getExitDoor(currentRoom.doors);
+		var doorIndex = getExitDoor(gameVars.currentRoom.doors);
 		// doorIndex  0 = n (subtract 1 from row)
 		// 1 = s (add one to row)
 		// 2 = e (add one to column)
 		// 3 = w (subtract one from column)
 		switch (doorIndex){
 			case 0 : {
-				if (!allRooms[(currentRoom.location -1) - MAX_COLS].isPath
-				&& !allRooms[(currentRoom.location -1) - MAX_COLS].hasOgre
-				&& !allRooms[(currentRoom.location -1) - MAX_COLS].hasTrap){
-					currentRoom = allRooms[(currentRoom.location -1) - MAX_COLS];
+				if (!gameVars.allRooms[(gameVars.currentRoom.location -1) - gameVars.MAX_COLS].isPath
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) - gameVars.MAX_COLS].hasOgre
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) - gameVars.MAX_COLS].hasTrap){
+					gameVars.currentRoom = gameVars.allRooms[(gameVars.currentRoom.location -1) - gameVars.MAX_COLS];
 				}
 				else{
 					continue;
@@ -231,10 +180,10 @@ function generatePath(){
 				break;
 			}
 			case 1 : {
-				if (!allRooms[(currentRoom.location -1) + MAX_COLS].isPath
-				&& !allRooms[(currentRoom.location -1) + MAX_COLS].hasOgre
-				&& !allRooms[(currentRoom.location -1) + MAX_COLS].hasTrap){
-					currentRoom = allRooms[(currentRoom.location -1) + MAX_COLS];
+				if (!gameVars.allRooms[(gameVars.currentRoom.location -1) + gameVars.MAX_COLS].isPath
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) + gameVars.MAX_COLS].hasOgre
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) + gameVars.MAX_COLS].hasTrap){
+					gameVars.currentRoom = gameVars.allRooms[(gameVars.currentRoom.location -1) + gameVars.MAX_COLS];
 				}
 				else{
 					continue;
@@ -242,10 +191,10 @@ function generatePath(){
 				break;
 			}
 			case 2 : {
-				if (!allRooms[(currentRoom.location -1) + 1].isPath
-				&& !allRooms[(currentRoom.location -1) + 1].hasOgre
-				&& !allRooms[(currentRoom.location -1) + 1].hasTrap){
-					currentRoom = allRooms[(currentRoom.location -1) + 1];
+				if (!gameVars.allRooms[(gameVars.currentRoom.location -1) + 1].isPath
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) + 1].hasOgre
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) + 1].hasTrap){
+					gameVars.currentRoom = gameVars.allRooms[(gameVars.currentRoom.location -1) + 1];
 				}
 				else{
 					continue;
@@ -253,10 +202,10 @@ function generatePath(){
 				break;
 			}
 			case 3 : {
-				if (!allRooms[(currentRoom.location -1) - 1].isPath
-				&& !allRooms[(currentRoom.location -1) - 1].hasOgre
-				&& !allRooms[(currentRoom.location -1) - 1].hasTrap){
-					currentRoom = allRooms[(currentRoom.location -1) - 1];
+				if (!gameVars.allRooms[(gameVars.currentRoom.location -1) - 1].isPath
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) - 1].hasOgre
+				&& !gameVars.allRooms[(gameVars.currentRoom.location -1) - 1].hasTrap){
+					gameVars.currentRoom = gameVars.allRooms[(gameVars.currentRoom.location -1) - 1];
 				}
 				else{
 					continue;
@@ -264,8 +213,8 @@ function generatePath(){
 				break;
 			}
 		}
-		currentRoom.isPath = true;
-		path.push(currentRoom);
+		gameVars.currentRoom.isPath = true;
+		gameVars.path.push(gameVars.currentRoom);
 	}
 }
 
@@ -285,24 +234,24 @@ function getExitDoor(doors){
 function initializeRooms(){
 	initGrid();
 	
-	for (var i = 1; i <=GRID_SIZE;i++){
-		allRooms.push(new room({location:i}));
-		allRooms[i-1].init();
+	for (var i = 1; i <=gameVars.GRID_SIZE;i++){
+		gameVars.allRooms.push(new room({location:i}));
+		gameVars.allRooms[i-1].init();
 	}
 }
 
 function DrawDirections(room){
     
-	ctx.strokeStyle = '#ff000';
-	ctx.globalAlpha = 1;
-	ctx.fillText(getPossibleDirections(room.doors), room.textLocationX,room.textLocationY);
-	ctx.fillText(room.location, room.textLocationX, room.textLocationY + 10);
+	gameVars.ctx.strokeStyle = '#ff000';
+	gameVars.ctx.globalAlpha = 1;
+	gameVars.ctx.fillText(getPossibleDirections(room.doors), room.textLocationX,room.textLocationY);
+	gameVars.ctx.fillText(room.location, room.textLocationX, room.textLocationY + 10);
 	
 }
 
 function getRowNumber(location){
-	for (var x =0; x < cols.length;x++){
-		if (cols[x] - location >= 0){
+	for (var x =0; x < gameVars.cols.length;x++){
+		if (gameVars.cols[x] - location >= 0){
 			// return column number as index + 1
 			var row = x+1;
 			return x+1;
@@ -311,89 +260,17 @@ function getRowNumber(location){
 }
 
 function getColumnNumber(location){
-	for (var x =0; x < rows.length;x++){
-		if (rows[x] - location >= 0){
+	for (var x =0; x < gameVars.rows.length;x++){
+		if (gameVars.rows[x] - location >= 0){
 			var col = x+1;
-			if (location <= MAX_COLS){
-				return location % MAX_COLS == 0 ? location  : location % MAX_COLS;
+			if (location <= gameVars.MAX_COLS){
+				return location % gameVars.MAX_COLS == 0 ? location  : location % gameVars.MAX_COLS;
 			}
 			else{
-				return location % MAX_COLS == 0 ? location - (MAX_COLS*(x-1))  : location % MAX_COLS;
+				return location % gameVars.MAX_COLS == 0 ? location - (gameVars.MAX_COLS*(x-1))  : location % gameVars.MAX_COLS;
 			}
 		}
 	}
-}
-
-function room(roomInfo){
-	// location is a value from 1 to MAX_COLS
-	if (roomInfo != undefined && roomInfo != null){
-		//console.log("roomInfo.location : " + roomInfo.location);
-		this.location = roomInfo.location;
-	}
-	// we will use visited to determine if user has already been in this room
-	// room 1 is always initially visited since that is where user starts
-	this.visited = this.location == 1 ? true : false;
-	
-	this.doors = [0,0,0,0];
-	this.column = getColumnNumber(this.location);
-	this.row = getRowNumber(this.location);
-	this.textLocationX = (this.column *(lineInterval )) - (lineInterval /2);
-	this.textLocationY = (this.row * (lineInterval )) - (lineInterval /2);
-	this.minPoint = new point ((this.column-1) * lineInterval, (this.row-1)*lineInterval);
-	this.maxPoint = new point ((this.column) * lineInterval, (this.row)*lineInterval);;
-	
-	this.init = function(){
-		this.isPath = false; // it isn't on path until a path is generated
-		this.hasOgre = false;
-		this.hasTrap = false;
-		// ###### If this is the first row, set up directions
-		if (this.row == 1){
-			this.doors[s] = 1;
-			if (this.column != 1){
-				this.doors[w] = 1;
-			}
-			if (this.column != MAX_COLS){
-				this.doors[e] =1;
-			}
-		}
-		
-		if (this.location % MAX_COLS == 0){
-			this.doors[w] = 1;
-			if (this.location != GRID_SIZE){
-				this.doors[s] = 1;
-			}
-			if (this.location != MAX_COLS){
-				this.doors[n] = 1;
-			}
-		}
-
-		if (this.column != 1 && this.column != MAX_COLS){
-			if (this.row != 1 && this.row != MAX_COLS){
-				this.doors[n] = this.doors[s] = this.doors[e] = this.doors[w] = 1;
-			}
-		}
-		
-		if (this.column == 1 && this.row !=1 && this.row != MAX_COLS){
-			this.doors[n] = this.doors[s] = this.doors[e] = 1;
-		}
-
-		// ##### If this is the last row set up directions
-		if (this.row == MAX_COLS){
-			this.doors[n] = 1;
-			if (this.column != 1){
-				this.doors[w]=1;
-			}
-			if (this.column != MAX_COLS){
-				this.doors[e] = 1;
-			}
-		}
-	}
-	// locations 1 - 6 cannot have up as a direction
-	// locations 1,7,13,19,25,31 cannot have west as a direction
-	// locations 31 - 36 cannot have down as a direction
-	// locations 6, 12, 18, 24, 30, 36 cannot have right as direction
-	//var doors = []; // contains four values (u,d,l,r) either 0 or 1
-	
 }
 
 function getPossibleDirections(doors){
@@ -421,15 +298,15 @@ function getPossibleDirections(doors){
 function reGenPath(){
 	initGrid();
 	initApp();
-	allRooms = [];
-	path = [];
-	ogres = [];
-	traps = [];
-	possibleOgresAndTraps = [];
-	unblockedRooms = [];
+	gameVars.allRooms = [];
+	gameVars.path = [];
+	gameVars.ogres = [];
+	gameVars.traps = [];
+	gameVars.possibleOgresAndTraps = [];
+	gameVars.unblockedRooms = [];
 	stopClock();
-	gameclockHandle = setInterval(updateGameClock, 1000);
-	gameclockSecondCounter = 0;
+	gameVars.gameclockHandle = setInterval(updateGameClock, 1000);
+	gameVars.gameclockSecondCounter = 0;
 	initUnblockedRooms();
 	initPossibles();
 	initializeRooms();
@@ -443,11 +320,11 @@ function reGenPath(){
 
 function reTryPath(){
 	initGrid();
-	if (MAX_COLS != PREV_COL_SIZE){
+	if (gameVars.MAX_COLS != gameVars.PREV_COL_SIZE){
 			reGenPath();
 			return;
 	}
-	path= [];
+	gameVars.path= [];
 	initPossibles();
 	initializeRooms();
 	addOgresAndTrapsToRooms();
@@ -457,28 +334,28 @@ function reTryPath(){
 
 function retryUntilSolved(){
 	initGrid();
-	if (MAX_COLS != PREV_COL_SIZE){
+	if (gameVars.MAX_COLS != gameVars.PREV_COL_SIZE){
 			reGenPath();
 			return;
 	}
-	solutionAttempts = 0;
-	while (solutionAttempts < MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
-		path= [];
+	gameVars.solutionAttempts = 0;
+	while (gameVars.solutionAttempts < gameVars.MAX_ATTEMPTS && gameVars.currentRoom.location != gameVars.GRID_SIZE){
+		gameVars.path= [];
 		initPossibles();
 		initializeRooms();
 		addOgresAndTrapsToRooms();
 		generatePath();
 		draw();
-		console.log("solutionAttempts : " + solutionAttempts++);
+		console.log("gameVars.solutionAttempts : " + gameVars.solutionAttempts++);
 	}
 	setTimeout(displayResults,1300);
 }
 
 function displayResults(){
-	if (solutionAttempts <= MAX_ATTEMPTS && currentRoom.location == GRID_SIZE){
-		alert ("Solved it in " + solutionAttempts + " solutionAttempts.");
+	if (gameVars.solutionAttempts <= gameVars.MAX_ATTEMPTS && gameVars.currentRoom.location == gameVars.GRID_SIZE){
+		alert ("Solved it in " + gameVars.solutionAttempts + " gameVars.solutionAttempts.");
 	}
-	if (solutionAttempts >=MAX_ATTEMPTS && currentRoom.location != GRID_SIZE){
+	if (gameVars.solutionAttempts >=gameVars.MAX_ATTEMPTS && gameVars.currentRoom.location != gameVars.GRID_SIZE){
 		alert("Most likely, this map is unsolvable.");
 	}
 	
@@ -486,71 +363,40 @@ function displayResults(){
 }
 
 function initUnblockedRooms(){
-	unblockedRooms.push(2); // 2 is always one no matter grid size.
-	unblockedRooms.push(MAX_COLS+1); // first room of 2nd row
-	unblockedRooms.push(MAX_COLS*(MAX_COLS-1)); // last room of 2nd to last row
-	unblockedRooms.push(GRID_SIZE-1); // 2nd to last room
+	gameVars.unblockedRooms.push(2); // 2 is always one no matter grid size.
+	gameVars.unblockedRooms.push(gameVars.MAX_COLS+1); // first room of 2nd row
+	gameVars.unblockedRooms.push(gameVars.MAX_COLS*(gameVars.MAX_COLS-1)); // last room of 2nd to last row
+	gameVars.unblockedRooms.push(gameVars.GRID_SIZE-1); // 2nd to last room
 }
 
 function initCanvas(){
 	
-	ctx.canvas.height  = (window.innerHeight - lineInterval);
-	ctx.canvas.width = ctx.canvas.height;
+	gameVars.ctx.canvas.height  = (window.innerHeight - gameVars.lineInterval);
+	gameVars.ctx.canvas.width = gameVars.ctx.canvas.height;
 	
-	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
+	gameVars.lineInterval = Math.floor(gameVars.ctx.canvas.width / gameVars.MAX_COLS);
 	
 	// the -5 in the two following lines makes the canvas area, just slightly smaller
 	// than the entire window.  this helps so the scrollbars do not appear.
-	ctx.canvas.height  = (window.innerHeight-lineInterval);
-	ctx.canvas.width = ctx.canvas.height;
-	ctx.strokeStyle = '#0000ff';
+	gameVars.ctx.canvas.height  = (window.innerHeight-gameVars.lineInterval);
+	gameVars.ctx.canvas.width = gameVars.ctx.canvas.height;
+	gameVars.ctx.strokeStyle = '#0000ff';
 
-	ctx.font = '10px sans-serif';
+	gameVars.ctx.font = '10px sans-serif';
 
-	ctx.globalAlpha = 1;
-	lineInterval = Math.floor(ctx.canvas.width / MAX_COLS);
+	gameVars.ctx.globalAlpha = 1;
+	gameVars.lineInterval = Math.floor(gameVars.ctx.canvas.width / gameVars.MAX_COLS);
 }
 
 function initApp()
 {
 	console.log("in initapp...");
-	
-	allGameItems = [];
-	allRooms = [];
-	cols = [];
-	ogres = [];
-	possibleOgresAndTraps = [];
-	rows = [];
-	traps = [];
-	unblockedRooms = [];
-	
-	playerTokenIdx = -1;
-	gameItemTokenIdx = -1;
-	pathIndexer = 0;
-	currentRoom = null;
-	maxColElement = document.getElementById("maxCols");
-	challengesCheck = document.getElementById("challengesCheck");
-	MAX_COLS = Number(maxColElement.value);
-	GRID_SIZE = MAX_COLS*MAX_COLS;
-	PREV_COL_SIZE = MAX_COLS;
-	MAX_ATTEMPTS = 500;
-	MAX_OGRES_TRAPS = 5;
-	solutionAttempts = 0;
-	// path is an array of rooms used by generatePath()
-	path = [];
+	gameVars = new GameVars();
 
-	initGrid();
-
-	allRooms = [];
-	path = [];
-	ogres = [];
-	traps = [];
-	possibleOgresAndTraps = [];
-	unblockedRooms = [];
-	allPlayers = [];
+	initGrid();	
 	
-	theCanvas = document.getElementById("gamescreen");
-	ctx = theCanvas.getContext("2d");
+	gameVars.theCanvas = document.getElementById("gamescreen");
+	gameVars.ctx = gameVars.theCanvas.getContext("2d");
 	
 	initCanvas();
 	
@@ -567,9 +413,9 @@ function initApp()
 	generatePath();
 	
 	initPlayers();
-	initTokens(45,60,allPlayers.length,"characterSet1",allPlayers);
+	initTokens(45,60,gameVars.allPlayers.length,"characterSet1",gameVars.allPlayers);
 	initGameItems();
-	initTokens(30,30,allGameItems.length,"items",allGameItems);
+	initTokens(30,30,gameVars.allGameItems.length,"items",gameVars.allGameItems);
 	setPlayerStartPositions();
 	draw();
 	drawGameItems();
@@ -582,42 +428,42 @@ function drawClippedAsset(sx,sy,swidth,sheight,x,y,w,h,imageId)
 	var img = document.getElementById(imageId);
 	if (img != null)
 	{
-		ctx.drawImage(img,sx,sy,swidth,sheight,x,y,w,h);
+		gameVars.ctx.drawImage(img,sx,sy,swidth,sheight,x,y,w,h);
 	}
 }
 
 function drawGameItems(){
 	
-    for (var tokenCount = 0; tokenCount < allGameItems.length; tokenCount++) {
+    for (var tokenCount = 0; tokenCount < gameVars.allGameItems.length; tokenCount++) {
 		drawClippedAsset(
-			allGameItems[tokenCount].token.imgSourceX,
-			allGameItems[tokenCount].token.imgSourceY,
-			allGameItems[tokenCount].token.imgSourceSize,
-			allGameItems[tokenCount].token.imgSourceSize,
-			allGameItems[tokenCount].token.gridLocation.x,
-			allGameItems[tokenCount].token.gridLocation.y,
-			allGameItems[tokenCount].token.size,
-			allGameItems[tokenCount].token.size,
-			allGameItems[tokenCount].token.imgIdTag
+			gameVars.allGameItems[tokenCount].token.imgSourceX,
+			gameVars.allGameItems[tokenCount].token.imgSourceY,
+			gameVars.allGameItems[tokenCount].token.imgSourceSize,
+			gameVars.allGameItems[tokenCount].token.imgSourceSize,
+			gameVars.allGameItems[tokenCount].token.gridLocation.x,
+			gameVars.allGameItems[tokenCount].token.gridLocation.y,
+			gameVars.allGameItems[tokenCount].token.size,
+			gameVars.allGameItems[tokenCount].token.size,
+			gameVars.allGameItems[tokenCount].token.imgIdTag
 		);
     }
 	// if the mouse is hovering over the location of a token, show yellow highlight
-    if (hoverToken !== null) {
-        ctx.fillStyle = "yellow";
-        ctx.globalAlpha = .5
-        ctx.fillRect(hoverToken.gridLocation.x, hoverToken.gridLocation.y, 
-                  hoverToken.size, hoverToken.size);
-        ctx.globalAlpha = 1;
+    if (gameVars.hoverToken !== null && gameVars.hoverToken != undefined) {
+        gameVars.ctx.fillStyle = "yellow";
+        gameVars.ctx.globalAlpha = .5;
+        gameVars.ctx.fillRect(gameVars.hoverToken.gridLocation.x, gameVars.hoverToken.gridLocation.y, 
+                  gameVars.hoverToken.size, gameVars.hoverToken.size);
+        gameVars.ctx.globalAlpha = 1;
 		drawClippedAsset(
-			hoverToken.imgSourceX,
-			hoverToken.imgSourceY,
-			hoverToken.imgSourceSize,
-			hoverToken.imgSourceSize,
-			hoverToken.gridLocation.x,
-			hoverToken.gridLocation.y,
-			hoverToken.size,
-			hoverToken.size,
-			hoverToken.imgIdTag
+			gameVars.hoverToken.imgSourceX,
+			gameVars.hoverToken.imgSourceY,
+			gameVars.hoverToken.imgSourceSize,
+			gameVars.hoverToken.imgSourceSize,
+			gameVars.hoverToken.gridLocation.x,
+			gameVars.hoverToken.gridLocation.y,
+			gameVars.hoverToken.size,
+			gameVars.hoverToken.size,
+			gameVars.hoverToken.imgIdTag
 		);
     }
 }
@@ -627,86 +473,70 @@ function draw() {
 	
 	initCanvas();
 
-	for (var lineCount=0;lineCount<MAX_COLS;lineCount++)
+	for (var lineCount=0;lineCount<gameVars.MAX_COLS;lineCount++)
 	{
-		ctx.fillStyle="blue";
-		ctx.fillRect(0,lineInterval*(lineCount+1),ctx.canvas.width,2);
-		ctx.fillRect(lineInterval*(lineCount+1),0,2,ctx.canvas.width);
+		gameVars.ctx.fillStyle="blue";
+		gameVars.ctx.fillRect(0,gameVars.lineInterval*(lineCount+1),gameVars.ctx.canvas.width,2);
+		gameVars.ctx.fillRect(gameVars.lineInterval*(lineCount+1),0,2,gameVars.ctx.canvas.width);
 	}
 	
-	if (allRooms !== undefined){
-		for (var i = 1; i <=GRID_SIZE;i++){
-			if  (allRooms[i-1] !== undefined && allRooms[i-1].doors !== undefined){
-				DrawDirections(allRooms[i-1]);
+	if (gameVars.allRooms !== undefined){
+		for (var i = 1; i <=gameVars.GRID_SIZE;i++){
+			if  (gameVars.allRooms[i-1] !== undefined && gameVars.allRooms[i-1].doors !== undefined){
+				DrawDirections(gameVars.allRooms[i-1]);
 			}
 		}
 	}
-	if (path.length > 0){
+	if (gameVars.path.length > 0){
 		//drawPath();
 	}
 	drawTrapsAndOgres();
 	
 	// draw each token it its current location
-    for (var tokenCount = 0; tokenCount < allPlayers.length; tokenCount++) {
+    for (var tokenCount = 0; tokenCount < gameVars.allPlayers.length; tokenCount++) {
 		drawClippedAsset(
-			allPlayers[tokenCount].token.imgSourceX,
-			allPlayers[tokenCount].token.imgSourceY,
-			allPlayers[tokenCount].token.imgSourceSize,
-			allPlayers[tokenCount].token.imgSourceSize,
-			allPlayers[tokenCount].token.gridLocation.x,
-			allPlayers[tokenCount].token.gridLocation.y,
-			allPlayers[tokenCount].token.size,
-			allPlayers[tokenCount].token.size,
-			allPlayers[tokenCount].token.imgIdTag
+			gameVars.allPlayers[tokenCount].token.imgSourceX,
+			gameVars.allPlayers[tokenCount].token.imgSourceY,
+			gameVars.allPlayers[tokenCount].token.imgSourceSize,
+			gameVars.allPlayers[tokenCount].token.imgSourceSize,
+			gameVars.allPlayers[tokenCount].token.gridLocation.x,
+			gameVars.allPlayers[tokenCount].token.gridLocation.y,
+			gameVars.allPlayers[tokenCount].token.size,
+			gameVars.allPlayers[tokenCount].token.size,
+			gameVars.allPlayers[tokenCount].token.imgIdTag
 		);
     }
 	// if the mouse is hovering over the location of a token, show yellow highlight
-    if (hoverToken !== null) {
-        ctx.fillStyle = "yellow";
-        ctx.globalAlpha = .5
-        ctx.fillRect(hoverToken.gridLocation.x, hoverToken.gridLocation.y, 
-                  hoverToken.size, hoverToken.size);
-        ctx.globalAlpha = 1;
+    if (gameVars.hoverToken !== null && gameVars.hoverToken != undefined) {
+        gameVars.ctx.fillStyle = "yellow";
+        gameVars.ctx.globalAlpha = .5;
+		
+        gameVars.ctx.fillRect(gameVars.hoverToken.gridLocation.x, gameVars.hoverToken.gridLocation.y, 
+                  gameVars.hoverToken.size, gameVars.hoverToken.size);
+        gameVars.ctx.globalAlpha = 1;
 		drawClippedAsset(
-			hoverToken.imgSourceX,
-			hoverToken.imgSourceY,
-			hoverToken.imgSourceSize,
-			hoverToken.imgSourceSize,
-			hoverToken.gridLocation.x,
-			hoverToken.gridLocation.y,
-			hoverToken.size,
-			hoverToken.size,
-			hoverToken.imgIdTag
+			gameVars.hoverToken.imgSourceX,
+			gameVars.hoverToken.imgSourceY,
+			gameVars.hoverToken.imgSourceSize,
+			gameVars.hoverToken.imgSourceSize,
+			gameVars.hoverToken.gridLocation.x,
+			gameVars.hoverToken.gridLocation.y,
+			gameVars.hoverToken.size,
+			gameVars.hoverToken.size,
+			gameVars.hoverToken.imgIdTag
 		);
     }
 }
 
 function displayChallengesClicked(){
-	if (challengesCheck.checked == true){
-		isChallengesDisplayed = true;
+	if (gameVars.challengesCheck.checked == true){
+		gameVars.isChallengesDisplayed = true;
 		draw();
 	}
 	else{
-		isChallengesDisplayed = false;
+		gameVars.isChallengesDisplayed = false;
 		draw();
-		console.log(isChallengesDisplayed);
-	}
-}
-
-function gridlocation(value){
-    this.x = value.x;
-    this.y = value.y
-}
-
-function token(userToken){
-	// represents the users onscreen token
-	if (userToken !== undefined){
-    this.size = userToken.size;
-    this.imgSourceX = userToken.imgSourceX;
-    this.imgSourceY = userToken.imgSourceY;
-    this.imgSourceSize = userToken.imgSourceSize;
-    this.imgIdTag = userToken.imgIdTag;
-    this.gridLocation = userToken.gridLocation;
+		console.log(gameVars.isChallengesDisplayed);
 	}
 }
 
@@ -738,7 +568,7 @@ function initTokens(iconSize,sizeInBitmap,iconCount,imageIdTag,targetArray){
 
 function mouseMoveHandler(e)
 {
-    if (mouseIsCaptured)
+    if (gameVars.mouseIsCaptured)
     {    
         if (hoverItem.isMoving)
         {
@@ -747,7 +577,7 @@ function mouseMoveHandler(e)
 			hoverItem.gridLocation.y = hoverItemPoint.y - hoverItem.offSetY;
 			
 			//45 on next line is width/height of each token - needs to be variable later
-			var maxGridLocation = lineInterval * (MAX_COLS) -45;
+			var maxGridLocation = gameVars.lineInterval * (gameVars.MAX_COLS) -45;
 			
 			 if (hoverItemPoint.x < 0)
 			  {
@@ -773,16 +603,16 @@ function mouseMoveHandler(e)
     else
     {
 		var playerTokens = [];
-		for (x = 0; x < allPlayers.length;x++){
-			playerTokens.push(allPlayers[x].token);
+		for (x = 0; x < gameVars.allPlayers.length;x++){
+			playerTokens.push(gameVars.allPlayers[x].token);
 		}
-        hoverToken = hitTestHoverItem(getMousePos(e), playerTokens);
+        gameVars.hoverToken = hitTestHoverItem(getMousePos(e), playerTokens);
         draw();
 		var itemTokens = [];
-		for (x = 0; x < allGameItems.length;x++){
-			itemTokens.push(allGameItems[x].token);
+		for (x = 0; x < gameVars.allGameItems.length;x++){
+			itemTokens.push(gameVars.allGameItems[x].token);
 		}
-        hoverToken = hitTestHoverItem(getMousePos(e), itemTokens);
+        gameVars.hoverToken = hitTestHoverItem(getMousePos(e), itemTokens);
 		drawGameItems();
     }
 }
@@ -815,50 +645,34 @@ function hitTest(mouseLocation, hitTestObject)
   return false;
 }
 
-var point = function(x,y)
-{
-	this.x = x;
-	this.y = y;
-};
-
 function initPlayers(){
-	allPlayers.push (new player({characterType: "barbarian", hasAbility: true, token: new token()})); 
-	allPlayers.push (new player({characterType: "wizard", hasAbility: false, token: new token()})); 
-	allPlayers.push (new player({characterType: "thief", hasAbility: true, token: new token()})); 
-	allPlayers.push (new player({characterType: "elf", hasAbility: false, token: new token()})); 
-	allPlayers.push (new player({characterType: "leader", hasAbility: false, token: new token()})); 
+	gameVars.allPlayers.push (new player({characterType: "barbarian", hasAbility: true, token: new token()})); 
+	gameVars.allPlayers.push (new player({characterType: "wizard", hasAbility: false, token: new token()})); 
+	gameVars.allPlayers.push (new player({characterType: "thief", hasAbility: true, token: new token()})); 
+	gameVars.allPlayers.push (new player({characterType: "elf", hasAbility: false, token: new token()})); 
+	gameVars.allPlayers.push (new player({characterType: "leader", hasAbility: false, token: new token()})); 
 }
 
 function initGameItems(){
-	allGameItems.push(new gameItem({type:"greater", isAvailable: true, token: new token()}));
-	allGameItems.push(new gameItem({type:"sniff",isAvailable: true, token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"greater", isAvailable: true, token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"sniff",isAvailable: true, token: new token()}));
 }
 
 function setPlayerStartPositions(){
 	var roomNumber = 0;
 	// barbarian
-	allPlayers[0].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1), y:lineInterval * (allRooms[roomNumber].row-1)}
+	gameVars.allPlayers[0].token.gridLocation = {x:gameVars.lineInterval * (gameVars.allRooms[roomNumber].column-1), y:gameVars.lineInterval * (gameVars.allRooms[roomNumber].row-1)}
 	//wizard  
 	// wizardOffset 
-	var wizardOffset = lineInterval
-	allPlayers[1].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1) + lineInterval - 45, y:lineInterval * (allRooms[roomNumber].row-1)}
+	var wizardOffset = gameVars.lineInterval
+	gameVars.allPlayers[1].token.gridLocation = {x:gameVars.lineInterval * (gameVars.allRooms[roomNumber].column-1) + gameVars.lineInterval - 45, y:gameVars.lineInterval * (gameVars.allRooms[roomNumber].row-1)}
 	// thief
-	allPlayers[2].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1) + (lineInterval /2 ) -15, y:lineInterval * (allRooms[roomNumber].row-1) + (lineInterval /2) -20}
+	gameVars.allPlayers[2].token.gridLocation = {x:gameVars.lineInterval * (gameVars.allRooms[roomNumber].column-1) + (gameVars.lineInterval /2 ) -15, y:gameVars.lineInterval * (gameVars.allRooms[roomNumber].row-1) + (gameVars.lineInterval /2) -20}
 	//elf
-	allPlayers[3].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1), y:lineInterval * (allRooms[roomNumber].row-1)+(lineInterval/2)}
+	gameVars.allPlayers[3].token.gridLocation = {x:gameVars.lineInterval * (gameVars.allRooms[roomNumber].column-1), y:gameVars.lineInterval * (gameVars.allRooms[roomNumber].row-1)+(gameVars.lineInterval/2)}
 	//leader
-	allPlayers[4].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1) + lineInterval - 45, y:lineInterval * (allRooms[roomNumber].row-1)+(lineInterval/2)}
+	gameVars.allPlayers[4].token.gridLocation = {x:gameVars.lineInterval * (gameVars.allRooms[roomNumber].column-1) + gameVars.lineInterval - 45, y:gameVars.lineInterval * (gameVars.allRooms[roomNumber].row-1)+(gameVars.lineInterval/2)}
 	
-}
-
-var player = function (initData){
-	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
-	this.characterType = initData.characterType;
-	this.hasSpecialAbility = initData.hasAbility;
-	this.token = initData.token;
-	this.setToken = function (token){
-		this.token = token;
-	};
 }
 
 function mouseDownHandler(event)
@@ -869,13 +683,13 @@ function mouseDownHandler(event)
 	// that means if one is on top of the other the later added one will also
 	// need to be hitTested first. That means we need to iterate through
 	// the array from largest indext to smallest
-	for (var tokenCount = allPlayers.length-1;tokenCount >=0;tokenCount--)
+	for (var tokenCount = gameVars.allPlayers.length-1;tokenCount >=0;tokenCount--)
 	{
-	  if (hitTest(currentPoint, allPlayers[tokenCount].token))
+	  if (hitTest(currentPoint, gameVars.allPlayers[tokenCount].token))
 	  {
 		// playerItemTokenIdx > -1 means that a player gameItem is being dragged around
-		playerTokenIdx = tokenCount;
-		currentToken = allPlayers[tokenCount].token;
+		gameVars.playerTokenIdx = tokenCount;
+		currentToken = gameVars.allPlayers[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
 		currentToken.offSetX = currentPoint.x - currentToken.gridLocation.x;
@@ -883,20 +697,20 @@ function mouseDownHandler(event)
 		currentToken.isMoving = true;
 		currentToken.idx = tokenCount;
 		hoverItem = currentToken;
-		allPlayers[tokenCount].setToken(currentToken);
+		gameVars.allPlayers[tokenCount].setToken(currentToken);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
-		mouseIsCaptured = true;
+		gameVars.mouseIsCaptured = true;
 		window.addEventListener("mouseup",mouseUpHandler);
 		return;
 	  }
 	}
-	for (var tokenCount = allGameItems.length-1;tokenCount >=0;tokenCount--)
+	for (var tokenCount = gameVars.allGameItems.length-1;tokenCount >=0;tokenCount--)
 	{
-	  if (hitTest(currentPoint, allGameItems[tokenCount].token))
+	  if (hitTest(currentPoint, gameVars.allGameItems[tokenCount].token))
 	  {
-		// gameItemTokenIdx > -1 means that a gameItem is being dragged around
-		gameItemTokenIdx = tokenCount;
-		currentToken = allGameItems[tokenCount].token;
+		// gameVars.gameItemTokenIdx > -1 means that a gameItem is being dragged around
+		gameVars.gameItemTokenIdx = tokenCount;
+		currentToken = gameVars.allGameItems[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
 		currentToken.offSetX = currentPoint.x - currentToken.gridLocation.x;
@@ -904,9 +718,9 @@ function mouseDownHandler(event)
 		currentToken.isMoving = true;
 		currentToken.idx = tokenCount;
 		hoverItem = currentToken;
-		allGameItems[tokenCount].setToken(currentToken);
+		gameVars.allGameItems[tokenCount].setToken(currentToken);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
-		mouseIsCaptured = true;
+		gameVars.mouseIsCaptured = true;
 		window.addEventListener("mouseup",mouseUpHandler);
 		return;
 	  }
@@ -914,38 +728,38 @@ function mouseDownHandler(event)
 }
 
 function stopClock(){
-	clearInterval(gameclockHandle);
+	clearInterval(gameVars.gameclockHandle);
 }
 
 
 function updateGameClock(){
 	var el = document.getElementById("gameclock");
-	gameclockSecondCounter++;
-	el.innerHTML = gameclockSecondCounter;
+	gameVars.gameclockSecondCounter++;
+	el.innerHTML = gameVars.gameclockSecondCounter;
 }
 
 function hitTestRoom(player){
 	// pass in player object and check which room she has moved to
 	// return room where player has moved her token
 	
-	for (var k = 0;k < allRooms.length; k++)
+	for (var k = 0;k < gameVars.allRooms.length; k++)
 	{
-		var testObjXmax = allRooms[k].maxPoint.x;// + 45;
-		var testObjYmax = allRooms[k].maxPoint.y;// + hitTestObjArray[k].size;
-		if ( ((player.token.gridLocation.x >= allRooms[k].minPoint.x) && (player.token.gridLocation.x <= testObjXmax)) && 
-			((player.token.gridLocation.y >= allRooms[k].minPoint.y) && (player.token.gridLocation.y <= testObjYmax)))
+		var testObjXmax = gameVars.allRooms[k].maxPoint.x;// + 45;
+		var testObjYmax = gameVars.allRooms[k].maxPoint.y;// + hitTestObjArray[k].size;
+		if ( ((player.token.gridLocation.x >= gameVars.allRooms[k].minPoint.x) && (player.token.gridLocation.x <= testObjXmax)) && 
+			((player.token.gridLocation.y >= gameVars.allRooms[k].minPoint.y) && (player.token.gridLocation.y <= testObjYmax)))
 		{
-			return allRooms[k];
+			return gameVars.allRooms[k];
 		}
 	}
 	return null;
 }
 
 function setPlayerDead(player){
-	for (x = 0; x < allPlayers.length;x++){
-		if (allPlayers[x].characterType == player.characterType){
-			console.log(allPlayers[x].characterType + " confirmed dead.");
-			allPlayers.splice(x,1);
+	for (x = 0; x < gameVars.allPlayers.length;x++){
+		if (gameVars.allPlayers[x].characterType == player.characterType){
+			console.log(gameVars.allPlayers[x].characterType + " confirmed dead.");
+			gameVars.allPlayers.splice(x,1);
 			return;
 		}
 	}
@@ -953,13 +767,13 @@ function setPlayerDead(player){
 
 function playerMovementHandler(playerTokenIdx){
 	var output = document.getElementById("output");
-	var player = allPlayers[playerTokenIdx];
+	var player = gameVars.allPlayers[playerTokenIdx];
 	room = hitTestRoom(player);
 	if (room == null) { 
 		return; // couldn't get room -- this is because of current issue with landing between rooms.
 	}
 	output.innerHTML = player.characterType + " moved into room " + room.location;
-	if (room.location == GRID_SIZE){
+	if (room.location == gameVars.GRID_SIZE){
 		output.innerHTML += "  You've won!";
 	}
 	if (room.hasOgre){
@@ -990,7 +804,7 @@ function playerMovementHandler(playerTokenIdx){
 		}
 	}
 	
-	if (allPlayers.length <= 0){
+	if (gameVars.allPlayers.length <= 0){
 			output.innerHTML += "  All your characters are dead.  You failed! :(";
 			stopClock();
 	}
@@ -998,7 +812,7 @@ function playerMovementHandler(playerTokenIdx){
 }
 
 function gameItemDropHandler(tokenIdx){
-	var gameItem = allGameItems[tokenIdx];
+	var gameItem = gameVars.allGameItems[tokenIdx];
 	var actionRoom = hitTestRoom(gameItem);
 	if (actionRoom == null){
 		return; // couldn't get valid room due to other bad code
@@ -1014,34 +828,205 @@ function gameItemDropHandler(tokenIdx){
 
 function mouseUpHandler()
 {
-	if (mouseIsCaptured)
+	if (gameVars.mouseIsCaptured)
 	{
 		//playSound(POP,1);
 	}
-	mouseIsCaptured = false;
-	for (var j = 0; j < allPlayers.length;j++)
+	gameVars.mouseIsCaptured = false;
+	for (var j = 0; j < gameVars.allPlayers.length;j++)
 	{
-		allPlayers[j].token.isMoving = false;
+		gameVars.allPlayers[j].token.isMoving = false;
 		
 	}
 	window.removeEventListener("mousemove", mouseDownHandler);
 	window.removeEventListener("mouseup", mouseUpHandler);
 	
-	if (playerTokenIdx > -1){
-		playerMovementHandler(playerTokenIdx);
-		playerTokenIdx = -1;
+	if (gameVars.playerTokenIdx > -1){
+		playerMovementHandler(gameVars.playerTokenIdx);
+		gameVars.playerTokenIdx = -1;
 	}
-	if (gameItemTokenIdx > -1){
-		gameItemDropHandler(gameItemTokenIdx);
-		gameItemTokenIdx = -1;
+	if (gameVars.gameItemTokenIdx > -1){
+		gameItemDropHandler(gameVars.gameItemTokenIdx);
+		gameVars.gameItemTokenIdx = -1;
 	}
 }
 
 function getMousePos(evt) {
 	
-	var rect = theCanvas.getBoundingClientRect();
+	var rect = gameVars.theCanvas.getBoundingClientRect();
 	var currentPoint = new point();
 	currentPoint.x = evt.clientX - rect.left;
 	currentPoint.y = evt.clientY - rect.top;
 	return currentPoint;
 }
+
+// #########################################################################
+// #########################################################################
+// ###################  THESE ARE ALL THE SPECIAL TYPES USED THROUGHOUT ####
+// #########################################################################
+
+function GameVars (){
+	this.n = 0;
+	this.s = 1;
+	this.e = 2;
+	this.w = 3;
+
+	this.allGameItems = [];
+	this.allPlayers = [];
+	this.allRooms = [];
+	this.cols = [];
+	this.ogres = [];
+	this.path = [];
+	this.possibleOgresAndTraps = [];
+	this.rows = [];
+	this.traps = [];
+	this.unblockedRooms = [];
+
+	this.pathIndexer = 0;
+	// hoverToken -- token being hovered over with mouse
+	this.hoverToken = null;
+
+
+	this.gameclockSecondCounter = 0;
+	this.gameclockHandle = null;
+
+	this.playerTokenIdx = -1;
+	this.gameItemTokenIdx = -1;
+
+	// we have a scoreboard that takes up the top 50px so 
+	// the canvas is always offset by 50px (value is set up in css scoreboard element)
+	//this.gridTopOffset = 50;
+
+	this.currentRoom = null;
+	this.maxColElement = document.getElementById("maxCols");
+	this.challengesCheck = document.getElementById("challengesCheck");
+	this.superstar = 33;
+	this.isChallengesDisplayed = true;
+	this.MAX_COLS = Number(this.maxColElement.value);
+	this.GRID_SIZE = this.MAX_COLS*this.MAX_COLS;
+	this.PREV_COL_SIZE = this.MAX_COLS;
+	this.MAX_ATTEMPTS = 500;
+	this.MAX_OGRES_TRAPS = 5;
+	this.solutionAttempts = 0;
+	// path is an array of rooms used by generatePath()
+
+	this.ctx = null;
+	this.theCanvas = null;
+	this.lineInterval = 0;
+
+	this.mouseIsCaptured = false;
+
+	console.log("before initapp...");
+	//initApp();
+	console.log("after window.addEventListener(load, initApp)");
+	return this;
+};
+
+var player = function (initData){
+	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
+	this.characterType = initData.characterType;
+	this.hasSpecialAbility = initData.hasAbility;
+	this.token = initData.token;
+	this.setToken = function (token){
+		this.token = token;
+	};
+}
+
+var point = function(x,y)
+{
+	this.x = x;
+	this.y = y;
+};
+
+var room = function(roomInfo){
+	// location is a value from 1 to gameVars.MAX_COLS
+	if (roomInfo != undefined && roomInfo != null){
+		//console.log("roomInfo.location : " + roomInfo.location);
+		this.location = roomInfo.location;
+	}
+	// we will use visited to determine if user has already been in this room
+	// room 1 is always initially visited since that is where user starts
+	this.visited = this.location == 1 ? true : false;
+	
+	this.doors = [0,0,0,0];
+	this.column = getColumnNumber(this.location);
+	this.row = getRowNumber(this.location);
+	this.textLocationX = (this.column *(gameVars.lineInterval )) - (gameVars.lineInterval /2);
+	this.textLocationY = (this.row * (gameVars.lineInterval )) - (gameVars.lineInterval /2);
+	this.minPoint = new point ((this.column-1) * gameVars.lineInterval, (this.row-1)*gameVars.lineInterval);
+	this.maxPoint = new point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);;
+	
+	this.init = function(){
+		this.isPath = false; // it isn't on path until a path is generated
+		this.hasOgre = false;
+		this.hasTrap = false;
+		// ###### If this is the first row, set up directions
+		if (this.row == 1){
+			this.doors[gameVars.s] = 1;
+			if (this.column != 1){
+				this.doors[gameVars.w] = 1;
+			}
+			if (this.column != gameVars.MAX_COLS){
+				this.doors[gameVars.e] =1;
+			}
+		}
+		
+		if (this.location % gameVars.MAX_COLS == 0){
+			this.doors[gameVars.w] = 1;
+			if (this.location != gameVars.GRID_SIZE){
+				this.doors[gameVars.s] = 1;
+			}
+			if (this.location != gameVars.MAX_COLS){
+				this.doors[gameVars.n] = 1;
+			}
+		}
+
+		if (this.column != 1 && this.column != gameVars.MAX_COLS){
+			if (this.row != 1 && this.row != gameVars.MAX_COLS){
+				this.doors[gameVars.n] = this.doors[gameVars.s] = this.doors[gameVars.e] = this.doors[gameVars.w] = 1;
+			}
+		}
+		
+		if (this.column == 1 && this.row !=1 && this.row != gameVars.MAX_COLS){
+			this.doors[gameVars.n] = this.doors[gameVars.s] = this.doors[gameVars.e] = 1;
+		}
+
+		// ##### If this is the last row set up directions
+		if (this.row == gameVars.MAX_COLS){
+			this.doors[gameVars.n] = 1;
+			if (this.column != 1){
+				this.doors[gameVars.w]=1;
+			}
+			if (this.column != gameVars.MAX_COLS){
+				this.doors[gameVars.e] = 1;
+			}
+		}
+	}
+	// locations 1 - 6 cannot have up as a direction
+	// locations 1,7,13,19,25,31 cannot have west as a direction
+	// locations 31 - 36 cannot have down as a direction
+	// locations 6, 12, 18, 24, 30, 36 cannot have right as direction
+	//var doors = []; // contains four values (u,d,l,r) either 0 or 1
+	
+};
+
+function gridlocation(value){
+    this.x = value.x;
+    this.y = value.y
+}
+
+function token(userToken){
+	// represents the users onscreen token
+	if (userToken !== undefined){
+    this.size = userToken.size;
+    this.imgSourceX = userToken.imgSourceX;
+    this.imgSourceY = userToken.imgSourceY;
+    this.imgSourceSize = userToken.imgSourceSize;
+    this.imgIdTag = userToken.imgIdTag;
+    this.gridLocation = userToken.gridLocation;
+	}
+}
+
+// ########################## END OF SPECIAL TYPES #########################
+// #########################################################################
+// #########################################################################
