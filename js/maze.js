@@ -466,7 +466,7 @@ function draw() {
 		}
 	}
 	if (gameVars.path.length > 0){
-		drawPath();
+		//drawPath();
 	}
 	drawTrapsAndOgres();
 	
@@ -519,11 +519,21 @@ function displayChallengesClicked(){
 }
 
 function gameItem(initData){
-	this.isAvailable = initData.isAvailable;
 	this.token = initData.token;
+	this.isAvailable = true;
 	this.type = initData.type;
+	this.useCounter = 0;
 	this.setToken = function (token){
 		this.token = token;
+	};
+	this.sniff = function (actionRoom){
+		if (this.useCounter < 3){
+			this.useCounter++;
+			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
+		}
+		else{
+			gameVars.outputElement.innerHTML = "The elf has no more powers of sniff left.";
+		}
 	};
 }
 
@@ -632,8 +642,8 @@ function initPlayers(){
 }
 
 function initGameItems(){
-	gameVars.allGameItems.push(new gameItem({type:"greater", isAvailable: true, token: new token()}));
-	gameVars.allGameItems.push(new gameItem({type:"sniff",isAvailable: true, token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"greater", token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"sniff", token: new token()}));
 }
 
 function setPlayerStartPositions(){
@@ -796,7 +806,7 @@ function gameItemDropHandler(tokenIdx){
 		return; // couldn't get valid room due to other bad code
 	}
 	if (gameItem.type == "sniff"){
-		output.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
+		gameItem.sniff(actionRoom);
 	}
 	if (gameItem.type == "greater"){
 		output.innerHTML = "The wizard has just cast a greater knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
@@ -878,6 +888,7 @@ function GameVars (){
 	this.currentRoom = null;
 	this.maxColElement = document.getElementById("maxCols");
 	this.challengesCheck = document.getElementById("challengesCheck");
+	this.outputElement = document.getElementById("output");
 	this.superstar = 33;
 	this.isChallengesDisplayed = true;
 	this.MAX_COLS = Number(this.maxColElement.value);
