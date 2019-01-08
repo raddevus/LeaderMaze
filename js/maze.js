@@ -556,7 +556,7 @@ function initApp()
 	
 	window.addEventListener("resize", initApp);
 	window.addEventListener("orientationchange", initApp);
-	window.addEventListener("mousemove", handleMouseMove);
+	window.addEventListener("mousemove", mouseMoveHandler);
     window.addEventListener("mousedown", mouseDownHandler);
 
 	initUnblockedRooms();
@@ -710,7 +710,7 @@ function token(userToken){
 	}
 }
 
-function item(initData){
+function gameItem(initData){
 	this.isAvailable = initData.isAvailable;
 	this.token = initData.token;
 	this.type = initData.type;
@@ -736,7 +736,7 @@ function initTokens(iconSize,sizeInBitmap,iconCount,imageIdTag,targetArray){
 	}
 }
 
-function handleMouseMove(e)
+function mouseMoveHandler(e)
 {
     if (mouseIsCaptured)
     {    
@@ -815,12 +815,10 @@ function hitTest(mouseLocation, hitTestObject)
   return false;
 }
 
-
-
 var point = function(x,y)
 {
-this.x = x;
-this.y = y;
+	this.x = x;
+	this.y = y;
 };
 
 function initPlayers(){
@@ -832,8 +830,8 @@ function initPlayers(){
 }
 
 function initGameItems(){
-	allGameItems.push(new item({type:"greater", isAvailable: true, token: new token()}));
-	allGameItems.push(new item({type:"sniff",isAvailable: true, token: new token()}));
+	allGameItems.push(new gameItem({type:"greater", isAvailable: true, token: new token()}));
+	allGameItems.push(new gameItem({type:"sniff",isAvailable: true, token: new token()}));
 }
 
 function setPlayerStartPositions(){
@@ -866,16 +864,16 @@ var player = function (initData){
 function mouseDownHandler(event)
 {
 
-var currentPoint = getMousePos(event);
-// barricades are added so that later added barricades have a higher z-order
-// that means if one is on top of the other the later added one will also
-// need to be hitTested first. That means we need to iterate through
-// the array from largest indext to smallest
+	var currentPoint = getMousePos(event);
+	// barricades are added so that later added barricades have a higher z-order
+	// that means if one is on top of the other the later added one will also
+	// need to be hitTested first. That means we need to iterate through
+	// the array from largest indext to smallest
 	for (var tokenCount = allPlayers.length-1;tokenCount >=0;tokenCount--)
 	{
 	  if (hitTest(currentPoint, allPlayers[tokenCount].token))
 	  {
-		// playerItemTokenIdx > -1 means that a player item is being dragged around
+		// playerItemTokenIdx > -1 means that a player gameItem is being dragged around
 		playerTokenIdx = tokenCount;
 		currentToken = allPlayers[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
@@ -896,7 +894,7 @@ var currentPoint = getMousePos(event);
 	{
 	  if (hitTest(currentPoint, allGameItems[tokenCount].token))
 	  {
-		// gameItemTokenIdx > -1 means that a game item is being dragged around
+		// gameItemTokenIdx > -1 means that a gameItem is being dragged around
 		gameItemTokenIdx = tokenCount;
 		currentToken = allGameItems[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
@@ -953,7 +951,7 @@ function setPlayerDead(player){
 	}
 }
 
-function handlePlayerMovement(playerTokenIdx){
+function playerMovementHandler(playerTokenIdx){
 	var output = document.getElementById("output");
 	var player = allPlayers[playerTokenIdx];
 	room = hitTestRoom(player);
@@ -999,7 +997,7 @@ function handlePlayerMovement(playerTokenIdx){
 	
 }
 
-function handleGameItemDrop(tokenIdx){
+function gameItemDropHandler(tokenIdx){
 	var gameItem = allGameItems[tokenIdx];
 	var actionRoom = hitTestRoom(gameItem);
 	if (actionRoom == null){
@@ -1030,11 +1028,11 @@ function mouseUpHandler()
 	window.removeEventListener("mouseup", mouseUpHandler);
 	
 	if (playerTokenIdx > -1){
-		handlePlayerMovement(playerTokenIdx);
+		playerMovementHandler(playerTokenIdx);
 		playerTokenIdx = -1;
 	}
 	if (gameItemTokenIdx > -1){
-		handleGameItemDrop(gameItemTokenIdx);
+		gameItemDropHandler(gameItemTokenIdx);
 		gameItemTokenIdx = -1;
 	}
 }
