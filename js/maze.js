@@ -562,7 +562,7 @@ function initApp()
 	initTokens(45,60,allPlayers.length,"characterSet1",allPlayers);
 	initGameItems();
 	initTokens(30,30,allGameItems.length,"items",allGameItems);
-	startGame();
+	setPlayerStartPositions();
 	draw();
 	drawGameItems();
 	
@@ -850,7 +850,7 @@ function initGameItems(){
 	allGameItems.push(new item({type:"sniff",isAvailable: true, token: new token()}));
 }
 
-function startGame(){
+function setPlayerStartPositions(){
 	var roomNumber = 0;
 	// barbarian
 	allPlayers[0].token.gridLocation = {x:lineInterval * (allRooms[roomNumber].column-1), y:lineInterval * (allRooms[roomNumber].row-1)}
