@@ -532,6 +532,7 @@ function gameItem(initData){
 			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
 		}
 		else{
+			removeGameItem(this.type);
 			gameVars.outputElement.innerHTML = "The elf has no more powers of sniff left.";
 		}
 	};
@@ -743,11 +744,31 @@ function hitTestRoom(gameAsset, rooms){
 	return null;
 }
 
+function getGameItemIdx(gameItemType){
+	for (x = 0; x < gameVars.allGameItems.length;x++){
+		if (gameVars.allGameItems[x].type == gameItemType){
+			return x;
+		}
+	}
+	return -1;
+}
+
+function removeGameItem(gameItemType){
+	// remove the sniff ability from the gameItems
+	var idx = getGameItemIdx(gameItemType);
+	if (idx > -1){
+		gameVars.allGameItems.splice(idx,1);
+		drawGameItems();
+	}
+}
+
 function setPlayerDead(player){
 	for (x = 0; x < gameVars.allPlayers.length;x++){
 		if (gameVars.allPlayers[x].characterType == player.characterType){
-			console.log(gameVars.allPlayers[x].characterType + " confirmed dead.");
 			gameVars.allPlayers.splice(x,1);
+			if (player.characterType == "elf"){
+				removeGameItem("sniff");
+			}
 			return;
 		}
 	}
