@@ -295,33 +295,11 @@ function getPossibleDirections(doors){
 	}
 	return possibleDirections;
 }
-function reGenPath(){
-	initGrid();
-	initApp();
-	gameVars.allRooms = [];
-	gameVars.path = [];
-	gameVars.ogres = [];
-	gameVars.traps = [];
-	gameVars.possibleOgresAndTraps = [];
-	gameVars.unblockedRooms = [];
-	stopClock();
-	gameVars.gameclockHandle = setInterval(updateGameClock, 1000);
-	gameVars.gameclockSecondCounter = 0;
-	initUnblockedRooms();
-	initPossibles();
-	initializeRooms();
-	placeOgresAndTraps();
-	addOgresAndTrapsToRooms();
-	generatePath();
-	var el = document.getElementById("output");
-	el.innerHTML = "";
-	draw();
-}
 
 function reTryPath(){
 	initGrid();
 	if (gameVars.MAX_COLS != gameVars.PREV_COL_SIZE){
-			reGenPath();
+			initApp();
 			return;
 	}
 	gameVars.path= [];
@@ -335,7 +313,7 @@ function reTryPath(){
 function retryUntilSolved(){
 	initGrid();
 	if (gameVars.MAX_COLS != gameVars.PREV_COL_SIZE){
-			reGenPath();
+			initApp();
 			return;
 	}
 	gameVars.solutionAttempts = 0;
@@ -488,7 +466,7 @@ function draw() {
 		}
 	}
 	if (gameVars.path.length > 0){
-		//drawPath();
+		drawPath();
 	}
 	drawTrapsAndOgres();
 	
