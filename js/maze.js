@@ -396,6 +396,7 @@ function initApp()
 	initGameItems();
 	initTokens(30,30,gameVars.allGameItems.length,"items",gameVars.allGameItems);
 	setPlayerStartPositions();
+	gameVars.isChallengesDisplayed = document.getElementById("challengesCheck").checked;
 	draw();
 	drawGameItems();
 	
