@@ -1,4 +1,5 @@
 // maze.js
+"use strict";
 
 window.addEventListener("load",initApp);
 
@@ -13,7 +14,7 @@ function initGrid(){
 
 function initCols(){
 	gameVars.cols=[];
-	for (x = 0; x< gameVars.MAX_COLS;x++){
+	for (var x = 0; x< gameVars.MAX_COLS;x++){
 		gameVars.cols.push(gameVars.MAX_COLS*(x+1));
 	}
 }
@@ -21,7 +22,7 @@ function initCols(){
 
 function initRows(){
 	gameVars.rows=[];
-	for (x = 0; x< gameVars.MAX_COLS +1;x++){
+	for (var x = 0; x< gameVars.MAX_COLS +1;x++){
 		gameVars.rows.push(gameVars.MAX_COLS*x+1);
 	}
 }
@@ -29,7 +30,7 @@ function initRows(){
 function initPossibles(){
 	// location 1 and gameVars.GRID_SIZE are off limits
 	// since they are the enter and exit rooms
-	for (x = 2; x < gameVars.GRID_SIZE; x++){
+	for (var x = 2; x < gameVars.GRID_SIZE; x++){
 		gameVars.possibleOgresAndTraps.push(x);
 	}
 }
@@ -108,10 +109,10 @@ function placeOgresAndTraps(){
 }
 
 function addOgresAndTrapsToRooms(){
-	for (o = 0; o < gameVars.ogres.length; o++){
+	for (var o = 0; o < gameVars.ogres.length; o++){
 		gameVars.allRooms[gameVars.ogres[o]-1].hasOgre = true;
 	}
-	for (t = 0; t < gameVars.traps.length; t++){
+	for (var t = 0; t < gameVars.traps.length; t++){
 		gameVars.allRooms[gameVars.traps[t]-1].hasTrap = true;
 	}
 
@@ -125,7 +126,7 @@ function drawTrapsAndOgres(){
 	// DRAW TRAPS
 	gameVars.ctx.globalAlpha = .5;
 	gameVars.ctx.fillStyle = "red";
-	for(x = 0; x < gameVars.traps.length; x++){
+	for(var x = 0; x < gameVars.traps.length; x++){
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
 		gameVars.ctx.fillRect(gameVars.allRooms[gameVars.traps[x]-1].textLocationX,gameVars.allRooms[gameVars.traps[x]-1].textLocationY+5,15,15);
@@ -136,7 +137,7 @@ function drawTrapsAndOgres(){
 	gameVars.ctx.fillStyle = "darkgreen";
 	gameVars.ctx.strokeStyle = '#003300';
 	gameVars.ctx.lineWidth = 1;
-	for(x = 0; x < gameVars.ogres.length; x++){
+	for(var x = 0; x < gameVars.ogres.length; x++){
 		// NOTE: the +5 on the Y side is just to move the square down a bit
 		// so you can read the direction letters.
 		gameVars.ctx.beginPath();	
@@ -221,7 +222,7 @@ function generatePath(){
 function getExitDoor(doors){
 	// returns the index of the original doors array 
 	var possibleDoors = [];
-	for (x = 0;x<doors.length;x++){
+	for (var x = 0;x<doors.length;x++){
 		if (doors[x] == 1){
 			// this is an array of the door indexes
 			possibleDoors.push(x);
@@ -369,7 +370,7 @@ function initCanvas(){
 function initApp()
 {
 	console.log("in initapp...");
-	gameVars = new GameVars();
+	window.gameVars = new GameVars();
 
 	initGrid();	
 	
@@ -559,30 +560,30 @@ function mouseMoveHandler(e)
 {
     if (gameVars.mouseIsCaptured)
     {    
-        if (hoverItem.isMoving)
+        if (gameVars.hoverToken.isMoving)
         {
 			var hoverItemPoint = getMousePos(e);
-			hoverItem.gridLocation.x = hoverItemPoint.x - hoverItem.offSetX;
-			hoverItem.gridLocation.y = hoverItemPoint.y - hoverItem.offSetY;
+			gameVars.hoverToken.gridLocation.x = hoverItemPoint.x - gameVars.hoverToken.offSetX;
+			gameVars.hoverToken.gridLocation.y = hoverItemPoint.y - gameVars.hoverToken.offSetY;
 			
 			//45 on next line is width/height of each token - needs to be variable later
 			var maxGridLocation = gameVars.lineInterval * (gameVars.MAX_COLS) -45;
 			
 			 if (hoverItemPoint.x < 0)
 			  {
-				hoverItem.gridLocation.x = 0;
+				gameVars.hoverToken.gridLocation.x = 0;
 			  }
 			  if (hoverItemPoint.x >= maxGridLocation)
 			  {
-				hoverItem.gridLocation.x = maxGridLocation;
+				gameVars.hoverToken.gridLocation.x = maxGridLocation;
 			  }
 			  if (hoverItemPoint.y < 0)
 			  { 
-				hoverItem.gridLocation.y = 0;
+				gameVars.hoverToken.gridLocation.y = 0;
 			  }
 			  if (hoverItemPoint.y >= maxGridLocation)
 			  {
-				hoverItem.gridLocation.y = maxGridLocation;
+				gameVars.hoverToken.gridLocation.y = maxGridLocation;
 			  } 
         }
         draw();
@@ -592,13 +593,13 @@ function mouseMoveHandler(e)
     else
     {
 		var playerTokens = [];
-		for (x = 0; x < gameVars.allPlayers.length;x++){
+		for (var x = 0; x < gameVars.allPlayers.length;x++){
 			playerTokens.push(gameVars.allPlayers[x].token);
 		}
         gameVars.hoverToken = hitTestHoverItem(getMousePos(e), playerTokens);
         draw();
 		var itemTokens = [];
-		for (x = 0; x < gameVars.allGameItems.length;x++){
+		for (var x = 0; x < gameVars.allGameItems.length;x++){
 			itemTokens.push(gameVars.allGameItems[x].token);
 		}
         gameVars.hoverToken = hitTestHoverItem(getMousePos(e), itemTokens);
@@ -678,14 +679,14 @@ function mouseDownHandler(event)
 	  {
 		// playerItemTokenIdx > -1 means that a player gameItem is being dragged around
 		gameVars.playerTokenIdx = tokenCount;
-		currentToken = gameVars.allPlayers[tokenCount].token;
+		var currentToken = gameVars.allPlayers[tokenCount].token;
 		// the offset value is the diff. between the place inside the barricade
 		// where the user clicked and the barricade's xy origin.
 		currentToken.offSetX = currentPoint.x - currentToken.gridLocation.x;
 		currentToken.offSetY = currentPoint.y - currentToken.gridLocation.y;
 		currentToken.isMoving = true;
 		currentToken.idx = tokenCount;
-		hoverItem = currentToken;
+		gameVars.hoverToken = currentToken;
 		gameVars.allPlayers[tokenCount].setToken(currentToken);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		gameVars.mouseIsCaptured = true;
@@ -706,7 +707,7 @@ function mouseDownHandler(event)
 		currentToken.offSetY = currentPoint.y - currentToken.gridLocation.y;
 		currentToken.isMoving = true;
 		currentToken.idx = tokenCount;
-		hoverItem = currentToken;
+		gameVars.hoverToken = currentToken;
 		gameVars.allGameItems[tokenCount].setToken(currentToken);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		gameVars.mouseIsCaptured = true;
@@ -745,7 +746,7 @@ function hitTestRoom(gameAsset, rooms){
 }
 
 function getGameItemIdx(gameItemType){
-	for (x = 0; x < gameVars.allGameItems.length;x++){
+	for (var x = 0; x < gameVars.allGameItems.length;x++){
 		if (gameVars.allGameItems[x].type == gameItemType){
 			return x;
 		}
@@ -763,7 +764,7 @@ function removeGameItem(gameItemType){
 }
 
 function setPlayerDead(player){
-	for (x = 0; x < gameVars.allPlayers.length;x++){
+	for (var x = 0; x < gameVars.allPlayers.length;x++){
 		if (gameVars.allPlayers[x].characterType == player.characterType){
 			gameVars.allPlayers.splice(x,1);
 			if (player.characterType == "elf"){
@@ -777,18 +778,19 @@ function setPlayerDead(player){
 function playerMovementHandler(playerTokenIdx){
 	var output = document.getElementById("output");
 	var currentPlayer = gameVars.allPlayers[playerTokenIdx];
-	var room = hitTestRoom(currentPlayer,gameVars.allRooms);
-	if (room == null) { 
-		return; // couldn't get room -- this is because of current issue with landing between rooms.
+	var localRoom = hitTestRoom(currentPlayer,gameVars.allRooms);
+
+	if (localRoom == null) { 
+		return; // couldn't get localRoom -- this is because of current issue with landing between rooms.
 	}
-	output.innerHTML = currentPlayer.characterType + " moved into room " + room.location;
-	if (room.location == gameVars.GRID_SIZE){
+	output.innerHTML = currentPlayer.characterType + " moved into localRoom " + localRoom.location;
+	if (localRoom.location == gameVars.GRID_SIZE){
 		output.innerHTML += "  You've won!";
 	}
-	if (room.hasOgre){
+	if (localRoom.hasOgre){
 		if (currentPlayer.characterType == "barbarian" && currentPlayer.hasSpecialAbility){
 			output.innerHTML += " You barbarian! You've killed an ogre. Beware! You will not survive the next ogre you meet.";
-			room.hasOgre = false;
+			localRoom.hasOgre = false;
 			currentPlayer.hasSpecialAbility = false;
 		}
 		else{
@@ -799,10 +801,10 @@ function playerMovementHandler(playerTokenIdx){
 		}
 	}
 	
-	if (room.hasTrap){
+	if (localRoom.hasTrap){
 		if (currentPlayer.characterType == "thief" && currentPlayer.hasSpecialAbility){
 			output.innerHTML += "  You thief! You've disarmed a trap.  Beware! You will not survive the next trap you find.";
-			room.hasTrap = false;
+			localRoom.hasTrap = false;
 			currentPlayer.hasSpecialAbility = false;
 		}
 		else{
