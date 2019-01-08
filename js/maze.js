@@ -803,28 +803,6 @@ function hitTestHoverItem(mouseLocation, hitTestObjArray)
   return null;
 }
 
-function hitTestReturnObject(mouseLocation, hitTestObjArray)
-{
-	console.log("array length : " + hitTestObjArray.length);
-	// send in an array of objects ret the one that is hit
-  console.log("hitTest Obj array...");
-  for (var k = 0;k < hitTestObjArray.length; k++)
-  {
-  console.log("k : " + k);
-  var testObjXmax = hitTestObjArray[k].x + hitTestObjArray[k].width;
-  var testObjYmax = hitTestObjArray[k].y + hitTestObjArray[k].height;
-  if ( ((mouseLocation.x >= hitTestObjArray[k].x) && (mouseLocation.x <= testObjXmax)) && 
-	((mouseLocation.y >= hitTestObjArray[k].y) && (mouseLocation.y <= testObjYmax)))
-  {
-	console.log("you got it");
-	
-	return hitTestObjArray[k];
-  }
-  
-  }
-  return null;
-}
-
 function hitTest(mouseLocation, hitTestObject)
 {
   var testObjXmax = hitTestObject.gridLocation.x + hitTestObject.size;
