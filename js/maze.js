@@ -726,18 +726,18 @@ function updateGameClock(){
 	el.innerHTML = gameVars.gameclockSecondCounter;
 }
 
-function hitTestRoom(player){
-	// pass in player object and check which room she has moved to
-	// return room where player has moved her token
+function hitTestRoom(gameAsset, rooms){
+	// pass in player or gameItem object and check which room the player or item has moved to
+	// returns room where player has moved her token
 	
-	for (var k = 0;k < gameVars.allRooms.length; k++)
+	for (var k = 0;k < rooms.length; k++)
 	{
-		var testObjXmax = gameVars.allRooms[k].maxPoint.x;// + 45;
-		var testObjYmax = gameVars.allRooms[k].maxPoint.y;// + hitTestObjArray[k].size;
-		if ( ((player.token.gridLocation.x >= gameVars.allRooms[k].minPoint.x) && (player.token.gridLocation.x <= testObjXmax)) && 
-			((player.token.gridLocation.y >= gameVars.allRooms[k].minPoint.y) && (player.token.gridLocation.y <= testObjYmax)))
+		var testObjXmax = rooms[k].maxPoint.x;// + 45;
+		var testObjYmax = rooms[k].maxPoint.y;// + hitTestObjArray[k].size;
+		if ( ((gameAsset.token.gridLocation.x >= rooms[k].minPoint.x) && (gameAsset.token.gridLocation.x <= testObjXmax)) && 
+			((gameAsset.token.gridLocation.y >= rooms[k].minPoint.y) && (gameAsset.token.gridLocation.y <= testObjYmax)))
 		{
-			return gameVars.allRooms[k];
+			return rooms[k];
 		}
 	}
 	return null;
@@ -755,38 +755,38 @@ function setPlayerDead(player){
 
 function playerMovementHandler(playerTokenIdx){
 	var output = document.getElementById("output");
-	var player = gameVars.allPlayers[playerTokenIdx];
-	room = hitTestRoom(player);
+	var currentPlayer = gameVars.allPlayers[playerTokenIdx];
+	var room = hitTestRoom(currentPlayer,gameVars.allRooms);
 	if (room == null) { 
 		return; // couldn't get room -- this is because of current issue with landing between rooms.
 	}
-	output.innerHTML = player.characterType + " moved into room " + room.location;
+	output.innerHTML = currentPlayer.characterType + " moved into room " + room.location;
 	if (room.location == gameVars.GRID_SIZE){
 		output.innerHTML += "  You've won!";
 	}
 	if (room.hasOgre){
-		if (player.characterType == "barbarian" && player.hasSpecialAbility){
+		if (currentPlayer.characterType == "barbarian" && currentPlayer.hasSpecialAbility){
 			output.innerHTML += " You barbarian! You've killed an ogre. Beware! You will not survive the next ogre you meet.";
 			room.hasOgre = false;
-			player.hasSpecialAbility = false;
+			currentPlayer.hasSpecialAbility = false;
 		}
 		else{
-			output.innerHTML += "  An ogre leaps on you and kills you! " +  player.characterType + " is dead.";
-			setPlayerDead(player);
+			output.innerHTML += "  An ogre leaps on you and kills you! " +  currentPlayer.characterType + " is dead.";
+			setPlayerDead(currentPlayer);
 			draw();
 
 		}
 	}
 	
 	if (room.hasTrap){
-		if (player.characterType == "thief" && player.hasSpecialAbility){
+		if (currentPlayer.characterType == "thief" && currentPlayer.hasSpecialAbility){
 			output.innerHTML += "  You thief! You've disarmed a trap.  Beware! You will not survive the next trap you find.";
 			room.hasTrap = false;
-			player.hasSpecialAbility = false;
+			currentPlayer.hasSpecialAbility = false;
 		}
 		else{
-			output.innerHTML +=  "  " + player.characterType + " has sprung a trap! "  +  player.characterType + " is dead.";
-			setPlayerDead(player);
+			output.innerHTML +=  "  " + currentPlayer.characterType + " has sprung a trap! "  +  currentPlayer.characterType + " is dead.";
+			setPlayerDead(currentPlayer);
 			draw();
 			
 		}
@@ -801,7 +801,7 @@ function playerMovementHandler(playerTokenIdx){
 
 function gameItemDropHandler(tokenIdx){
 	var gameItem = gameVars.allGameItems[tokenIdx];
-	var actionRoom = hitTestRoom(gameItem);
+	var actionRoom = hitTestRoom(gameItem,gameVars.allRooms);
 	if (actionRoom == null){
 		return; // couldn't get valid room due to other bad code
 	}
@@ -811,7 +811,6 @@ function gameItemDropHandler(tokenIdx){
 	if (gameItem.type == "greater"){
 		output.innerHTML = "The wizard has just cast a greater knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
 	}
-	
 }
 
 function mouseUpHandler()
@@ -909,9 +908,9 @@ function GameVars (){
 	//initApp();
 	console.log("after window.addEventListener(load, initApp)");
 	return this;
-};
+}
 
-var player = function (initData){
+function  player (initData){
 	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
 	this.characterType = initData.characterType;
 	this.hasSpecialAbility = initData.hasAbility;
@@ -921,13 +920,13 @@ var player = function (initData){
 	};
 }
 
-var point = function(x,y)
+function point(x,y)
 {
 	this.x = x;
 	this.y = y;
-};
+}
 
-var room = function(roomInfo){
+function room(roomInfo){
 	// location is a value from 1 to gameVars.MAX_COLS
 	if (roomInfo != undefined && roomInfo != null){
 		//console.log("roomInfo.location : " + roomInfo.location);
@@ -997,7 +996,7 @@ var room = function(roomInfo){
 	// locations 6, 12, 18, 24, 30, 36 cannot have right as direction
 	//var doors = []; // contains four values (u,d,l,r) either 0 or 1
 	
-};
+}
 
 function gridlocation(value){
     this.x = value.x;
