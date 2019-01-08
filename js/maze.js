@@ -508,18 +508,19 @@ function initCanvas(){
 function initApp()
 {
 	console.log("in initapp...");
-
-	ogres = [];
-	traps = [];
-	cols = [];
-	rows = [];
-	allRooms = [];
-	possibleOgresAndTraps = [];
+	
 	allGameItems = [];
+	allRooms = [];
+	cols = [];
+	ogres = [];
+	possibleOgresAndTraps = [];
+	rows = [];
+	traps = [];
+	unblockedRooms = [];
+	
 	playerTokenIdx = -1;
 	gameItemTokenIdx = -1;
 	pathIndexer = 0;
-	unblockedRooms = [];
 	currentRoom = null;
 	maxColElement = document.getElementById("maxCols");
 	challengesCheck = document.getElementById("challengesCheck");
@@ -533,6 +534,7 @@ function initApp()
 	path = [];
 
 	initGrid();
+
 	allRooms = [];
 	path = [];
 	ogres = [];
@@ -546,7 +548,7 @@ function initApp()
 	
 	initCanvas();
 	
-	//window.addEventListener("resize", initApp);
+	window.addEventListener("resize", initApp);
 	window.addEventListener("orientationchange", initApp);
 	window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mousedown", mouseDownHandler);
@@ -556,8 +558,8 @@ function initApp()
 	initializeRooms();
 	placeOgresAndTraps();
 	addOgresAndTrapsToRooms();
-	
 	generatePath();
+	
 	initPlayers();
 	initTokens(45,60,allPlayers.length,"characterSet1",allPlayers);
 	initGameItems();
