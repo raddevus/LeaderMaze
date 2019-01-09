@@ -736,10 +736,10 @@ function hitTestRoom(gameAsset, rooms){
 	
 	for (var k = 0;k < rooms.length; k++)
 	{
-		var testObjXmax = rooms[k].maxPoint.x;// + 45;
-		var testObjYmax = rooms[k].maxPoint.y;// + hitTestObjArray[k].size;
-		if ( ((gameAsset.token.gridLocation.x >= rooms[k].minPoint.x) && (gameAsset.token.gridLocation.x <= testObjXmax)) && 
-			((gameAsset.token.gridLocation.y >= rooms[k].minPoint.y) && (gameAsset.token.gridLocation.y <= testObjYmax)))
+		var testObjXmax = rooms[k].maxPoint.x;
+		var testObjYmax = rooms[k].maxPoint.y;
+		if ( (((gameAsset.token.gridLocation.x + (gameAsset.token.size /2)) >= rooms[k].minPoint.x) && ((gameAsset.token.gridLocation.x + (gameAsset.token.size /2))<= testObjXmax)) && 
+			(((gameAsset.token.gridLocation.y + (gameAsset.token.size / 2)) >= rooms[k].minPoint.y) && ((gameAsset.token.gridLocation.y + (gameAsset.token.size / 2)) <= testObjYmax)))
 		{
 			return rooms[k];
 		}
@@ -828,12 +828,30 @@ function playerMovementHandler(playerTokenIdx){
 	
 }
 
+function setClosestRoomCorner(gameAsset,targetRoom){
+	
+	if ((gameAsset.token.gridLocation.x - targetRoom.minPoint.x) < (targetRoom.minPoint.x - gameAsset.token.gridLocation.x )){
+			// minPoint is closer to token so set sniff on left side of room
+			gameAsset.token.gridLocation.x = targetRoom.minPoint.x - 13;
+			gameAsset.token.gridLocation.y = targetRoom.minPoint.y -13;
+	}
+	else{
+		gameAsset.token.gridLocation.x = targetRoom.maxPoint.x - 13;
+		gameAsset.token.gridLocation.y = targetRoom.minPoint.y -13;
+	}
+	draw();
+	drawGameItems();
+}
+
 function gameItemDropHandler(tokenIdx){
+	
 	var gameItem = gameVars.allGameItems[tokenIdx];
-	var actionRoom = hitTestRoom(gameItem,gameVars.allRooms);
+	var actionRoom = hitTestRoom(gameItem, gameVars.allRooms);
 	if (actionRoom == null){
 		return; // couldn't get valid room due to other bad code
 	}
+	setClosestRoomCorner(gameItem,actionRoom);
+	// var actionRoom = hitTestRoom(gameItem,gameVars.allRooms);
 	if (gameItem.type == "sniff"){
 		gameItem.sniff(actionRoom);
 	}
