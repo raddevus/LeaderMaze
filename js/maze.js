@@ -781,6 +781,43 @@ function setPlayerDead(player){
 	}
 }
 
+function placePlayerInRoom(inPlayer, inRoom){
+	// ############### sets player in same position in           ###############
+	// ############### every room dependent upon characterType   ###############
+	var roomNumber = 0;
+	var cellMiddleX = 0;
+	var cellMiddleY = 0;
+	switch (inPlayer.characterType){
+		case "barbarian" :
+		{
+			inPlayer.token.gridLocation = {x:inRoom.minPoint.x, y:inRoom.minPoint.y };
+			break;
+		}
+		case "wizard" :
+		{
+			inPlayer.token.gridLocation = {x:inRoom.maxPoint.x - (inPlayer.token.size/2), y:inRoom.minPoint.y};
+			break;
+		}
+		case "thief" :
+		{
+			cellMiddleX = inRoom.maxPoint.x - (inRoom.maxPoint.x - inRoom.minPoint.x)/3;
+			cellMiddleY = inRoom.maxPoint.y - (inRoom.maxPoint.y - inRoom.minPoint.y)/2;
+			inPlayer.token.gridLocation = {x:cellMiddleX - (inPlayer.token.size/2), y:cellMiddleY - (inPlayer.token.size/2)};
+			break;
+		}
+		case "elf" :
+		{
+			inPlayer.token.gridLocation = {x:inRoom.minPoint.x, y:inRoom.maxPoint.y - inPlayer.token.size };
+			break;
+		}
+		case "leader" :
+		{
+			inPlayer.token.gridLocation = {x:inRoom.maxPoint.x - (inPlayer.token.size/2), y:inRoom.maxPoint.y - inPlayer.token.size};
+			break;
+		}
+	}
+}
+
 function playerMovementHandler(playerTokenIdx){
 	var output = document.getElementById("output");
 	var currentPlayer = gameVars.allPlayers[playerTokenIdx];
@@ -789,6 +826,9 @@ function playerMovementHandler(playerTokenIdx){
 	if (localRoom == null) { 
 		return; // couldn't get localRoom -- this is because of current issue with landing between rooms.
 	}
+
+	placePlayerInRoom(currentPlayer, localRoom);
+
 	output.innerHTML = currentPlayer.characterType + " moved into localRoom " + localRoom.location;
 	if (localRoom.location == gameVars.GRID_SIZE){
 		output.innerHTML += "  You've won!";
