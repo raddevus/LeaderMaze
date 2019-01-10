@@ -506,6 +506,7 @@ function draw() {
 		);
     }
 	drawRevealedChallenges();
+	drawhighlightedRooms();
 }
 
 function displayChallengesClicked(){
@@ -711,6 +712,13 @@ function setPlayerRoomLocation(player){
 function mouseDownHandler(event)
 {
 	var currentPoint = getMousePos(event);
+
+
+	if (gameVars.lesserIsActivated){
+		//hitTestRoom(currentRoom
+		//return;
+	}
+
 	// barricades are added so that later added barricades have a higher z-order
 	// that means if one is on top of the other the later added one will also
 	// need to be hitTested first. That means we need to iterate through
@@ -1050,10 +1058,25 @@ function gameItemDropHandler(tokenIdx){
 	}
 	
 	if (gameItem.type == "lesser"){
-		output.innerHTML = "The wizard has just cast a LESSER knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
+		output.innerHTML = "The wizard has just cast a LESSER knowledge spell on room " + actionRoom.location + ".  Please click three other rooms.";
+		gameVars.lesserIsActivated = true;
+		gameVars.highlightedRooms.push(actionRoom);
+		//drawhighlightedRooms();
 		removeGameItem(gameItem.type);
 	}
 
+}
+
+function drawhighlightedRooms(){
+	if (gameVars.highlightedRooms.length < 1){
+		return;
+	}
+	gameVars.ctx.fillStyle = "yellow";
+	gameVars.ctx.globalAlpha = .5;
+	for (var x = 0; x < gameVars.highlightedRooms.length;x++){
+		gameVars.ctx.fillRect(gameVars.highlightedRooms[x].minPoint.x,gameVars.highlightedRooms[x].minPoint.y,gameVars.lineInterval,gameVars.lineInterval);
+	}
+	gameVars.ctx.globalAlpha = 1;
 }
 
 function mouseUpHandler()
@@ -1112,6 +1135,7 @@ function GameVars (){
 	this.traps = [];
 	this.unblockedRooms = [];
 	this.revealedItemRoomIndexes = [];
+	this.highlightedRooms = [];
 
 	this.pathIndexer = 0;
 	// hoverToken -- token being hovered over with mouse
@@ -1123,6 +1147,7 @@ function GameVars (){
 
 	this.playerTokenIdx = -1;
 	this.gameItemTokenIdx = -1;
+	this.lesserIsActivated = false;
 
 	// we have a scoreboard that takes up the top 50px so 
 	// the canvas is always offset by 50px (value is set up in css scoreboard element)
