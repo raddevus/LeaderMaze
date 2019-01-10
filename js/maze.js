@@ -399,8 +399,6 @@ function initApp()
 	gameVars.isChallengesDisplayed = document.getElementById("challengesCheck").checked;
 	draw();
 	drawGameItems();
-	
-
 }
 
 function drawClippedAsset(sx,sy,swidth,sheight,x,y,w,h,imageId)
@@ -506,6 +504,7 @@ function draw() {
 			gameVars.hoverToken.imgIdTag
 		);
     }
+	drawRevealedChallenges();
 }
 
 function displayChallengesClicked(){
@@ -953,6 +952,35 @@ function playerMovementHandler(playerTokenIdx){
 	
 }
 
+function drawRevealedChallenges(){
+	if (gameVars.revealedItemRoomIndexes.length < 1){
+		return;  // no revealed items to draw
+	}
+
+	for(var x = 0; x < gameVars.revealedItemRoomIndexes.length; x++){
+		// NOTE: the +5 on the Y side is just to move the square down a bit
+		// so you can read the direction letters.
+		if (gameVars.allRooms[gameVars.revealedItemRoomIndexes[x]].hasTrap){
+			// DRAW TRAPS
+			gameVars.ctx.globalAlpha = .5;
+			gameVars.ctx.fillStyle = "red";
+			gameVars.ctx.fillRect(gameVars.allRooms[gameVars.revealedItemRoomIndexes[x]].textLocationX,gameVars.allRooms[gameVars.revealedItemRoomIndexes[x]].textLocationY+5,15,15);
+		}
+		if (gameVars.allRooms[gameVars.revealedItemRoomIndexes[x]].hasOgre){
+			// DRAW gameVars.ogres
+			gameVars.ctx.fillStyle = "darkgreen";
+			gameVars.ctx.strokeStyle = '#003300';
+			gameVars.ctx.lineWidth = 1;
+			gameVars.ctx.beginPath();
+			gameVars.ctx.arc(gameVars.allRooms[gameVars.revealedItemRoomIndexes[x]].textLocationX,gameVars.allRooms[gameVars.revealedItemRoomIndexes[x]].textLocationY +8, 7, 0, 2 * Math.PI, false);
+			gameVars.ctx.fillStyle = 'green';
+			gameVars.ctx.fill();
+			gameVars.ctx.stroke();
+		}
+	}
+	gameVars.ctx.globalAlpha = 1;
+}
+
 function gameItemDropHandler(tokenIdx){
 	
 	var gameItem = gameVars.allGameItems[tokenIdx];
@@ -966,7 +994,21 @@ function gameItemDropHandler(tokenIdx){
 		gameItem.sniff(actionRoom);
 	}
 	if (gameItem.type == "greater"){
-		output.innerHTML = "The wizard has just cast a GREATER knowledge spell on room " + actionRoom.location + ".  Existing challenges will be revealed.";
+		output.innerHTML = "The wizard has just cast a GREATER knowledge spell on room " + actionRoom.location + ".";
+
+		if (actionRoom.hasOgre){
+			output.innerHTML += " Beware! The room has an ogre.";
+			gameVars.revealedItemRoomIndexes.push(actionRoom.location-1);
+			drawRevealedChallenges();
+		}
+		if (actionRoom.hasTrap){
+			output.innerHTML += " Beware! The room has a trap.";
+			gameVars.revealedItemRoomIndexes.push(actionRoom.location-1);
+			drawRevealedChallenges();
+		}
+		if (!actionRoom.hasTrap && !actionRoom.hasOgre){
+			output.innerHTML += " The room contains no challenges.";
+		}
 		removeGameItem(gameItem.type);
 	}
 	
@@ -1032,6 +1074,7 @@ function GameVars (){
 	this.rows = [];
 	this.traps = [];
 	this.unblockedRooms = [];
+	this.revealedItemRoomIndexes = [];
 
 	this.pathIndexer = 0;
 	// hoverToken -- token being hovered over with mouse
