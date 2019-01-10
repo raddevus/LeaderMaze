@@ -524,27 +524,50 @@ function gameItem(initData){
 	this.token = initData.token;
 	this.isAvailable = true;
 	this.type = initData.type;
-	this.useCounter = 0;
+	this.useCounter = 1;
 	this.setToken = function (token){
 		this.token = token;
 	};
 	this.sniff = function (actionRoom){
-		var elf = gameVars.allPlayers[3];
+		var elf = getPlayerByCharacterType("elf");
 		elf.location = hitTestRoom(elf,gameVars.allRooms).location;
 		if (actionRoom.location != elf.location){
 			gameVars.outputElement.innerHTML = "The elf cannot sniff that room (" + actionRoom.location +  ") because elf is in room " + elf.location + ". Please try again.";
 			return;
 		}
-		if (this.useCounter < 2){
+		if (this.useCounter < gameVars.MAX_SNIFFS){
 			this.useCounter++;
-			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
+			var ogreCount = getOgreCount(actionRoom);
+			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". There are " + ogreCount + " ogre(s) in the adjacent rooms.";
 		}
 		else{
 			removeGameItem(this.type);
-			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
+			var ogreCount = getOgreCount(actionRoom);
+			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". There are " + ogreCount + " ogre(s) in the adjacent rooms.";
 			gameVars.outputElement.innerHTML += "  The elf's sniff powers are gone.";
 		}
 	};
+}
+
+function getPlayerByCharacterType(charType){
+	for(var x = 0; x < gameVars.allPlayers.length;x++){
+		if (gameVars.allPlayers[x].characterType == charType){
+			return gameVars.allPlayers[x];
+		}
+	}
+	return null;
+}
+
+function getOgreCount(actionRoom){
+	var adjacentIndexes = getAdjacentRoomIndexes(actionRoom);
+	console.log(adjacentIndexes);
+	var ogreCounter = 0;
+	for (var z = 0; z < adjacentIndexes.length;z++){
+		if (gameVars.allRooms[adjacentIndexes[z]].hasOgre){
+			ogreCounter++;
+		}
+	}
+	return ogreCounter;
 }
 
 function initTokens(iconSize,sizeInBitmap,iconCount,imageIdTag,targetArray){
@@ -752,6 +775,49 @@ function hitTestRoom(gameAsset, rooms){
 		}
 	}
 	return null;
+}
+
+function getAdjacentRoomIndexes(roomToCheck){
+	var adjacentRoomIndexes = [];
+	for (var x = 0; x < roomToCheck.doors.length; x++){
+		switch (x){
+			case 0:{
+				console.log(x);
+				console.log(roomToCheck.doors[x]);
+				if (roomToCheck.doors[x] == 1){
+					// exit to north
+					// -6 to any idx is movement north but we need idx so we subtract 1 extra
+					adjacentRoomIndexes.push(roomToCheck.location - 7);
+				}
+				break;
+			}
+			case 1:{
+				if (roomToCheck.doors[x] == 1){
+					// exit to south
+					// + 6 to any index is a movement south, but only need +5 since location is idx + 1
+					adjacentRoomIndexes.push(roomToCheck.location + 5);
+				}
+				break;
+			}
+			case 2:{
+				if (roomToCheck.doors[x] == 1){
+					// exit to east
+					// add one to current room but location is already +1
+					adjacentRoomIndexes.push(roomToCheck.location);
+				}
+				break;
+			}
+			case 3:{
+				if (roomToCheck.doors[x] == 1){
+					// exit to west
+					// subrtract 2 to get idx - 1 for idx of this room, -1 for idx of room to west
+					adjacentRoomIndexes.push(roomToCheck.location - 2);
+				}
+				break;
+			}
+		}
+	}
+	return adjacentRoomIndexes;
 }
 
 function getGameItemIdx(gameItemType){
@@ -980,6 +1046,7 @@ function GameVars (){
 	this.PREV_COL_SIZE = this.MAX_COLS;
 	this.MAX_ATTEMPTS = 500;
 	this.MAX_OGRES_TRAPS = 5;
+	this.MAX_SNIFFS = 3;
 	this.solutionAttempts = 0;
 	// path is an array of rooms used by generatePath()
 
