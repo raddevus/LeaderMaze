@@ -854,6 +854,18 @@ function setPlayerDead(player){
 	}
 }
 
+function placeGameItemInRoom(inGameItem, inRoom){
+	switch (inGameItem.type){
+		case "sniff" :{
+			var cellMiddleX = 0;
+			var cellMiddleY = 0;
+			cellMiddleX = inRoom.maxPoint.x - (inRoom.maxPoint.x - inRoom.minPoint.x)/3;
+			cellMiddleY = inRoom.maxPoint.y - (inRoom.maxPoint.y - inRoom.minPoint.y)/2;
+			inGameItem.token.gridLocation = {x:cellMiddleX - (inGameItem.token.size/2), y:cellMiddleY - (inGameItem.token.size/2)};
+		}
+	}
+}
+
 function placePlayerInRoom(inPlayer, inRoom){
 	// ############### sets player in same position in           ###############
 	// ############### every room dependent upon characterType   ###############
@@ -950,6 +962,7 @@ function gameItemDropHandler(tokenIdx){
 	}
 
 	if (gameItem.type == "sniff"){
+		placeGameItemInRoom(gameItem,actionRoom);
 		gameItem.sniff(actionRoom);
 	}
 	if (gameItem.type == "greater"){
