@@ -529,13 +529,14 @@ function gameItem(initData){
 		this.token = token;
 	};
 	this.sniff = function (actionRoom){
-		if (this.useCounter < 3){
+		if (this.useCounter < 2){
 			this.useCounter++;
 			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
 		}
 		else{
 			removeGameItem(this.type);
-			gameVars.outputElement.innerHTML = "The elf has no more powers of sniff left.";
+			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
+			gameVars.outputElement.innerHTML += "  The elf's sniff powers are gone.";
 		}
 	};
 }
@@ -868,21 +869,6 @@ function playerMovementHandler(playerTokenIdx){
 	
 }
 
-function setClosestRoomCorner(gameAsset,targetRoom){
-	
-	if ((gameAsset.token.gridLocation.x - targetRoom.minPoint.x) < (targetRoom.minPoint.x - gameAsset.token.gridLocation.x )){
-			// minPoint is closer to token so set sniff on left side of room
-			gameAsset.token.gridLocation.x = targetRoom.minPoint.x - 13;
-			gameAsset.token.gridLocation.y = targetRoom.minPoint.y -13;
-	}
-	else{
-		gameAsset.token.gridLocation.x = targetRoom.maxPoint.x - 13;
-		gameAsset.token.gridLocation.y = targetRoom.minPoint.y -13;
-	}
-	draw();
-	drawGameItems();
-}
-
 function gameItemDropHandler(tokenIdx){
 	
 	var gameItem = gameVars.allGameItems[tokenIdx];
@@ -890,8 +876,7 @@ function gameItemDropHandler(tokenIdx){
 	if (actionRoom == null){
 		return; // couldn't get valid room due to other bad code
 	}
-	setClosestRoomCorner(gameItem,actionRoom);
-	// var actionRoom = hitTestRoom(gameItem,gameVars.allRooms);
+
 	if (gameItem.type == "sniff"){
 		gameItem.sniff(actionRoom);
 	}
