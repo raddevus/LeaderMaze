@@ -544,7 +544,7 @@ function gameItem(initData){
 		else{
 			removeGameItem(this.type);
 			var ogreCount = getOgreCount(actionRoom);
-			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". There are " + ogreCount + " ogre(s) in the adjacent rooms.";
+			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Elf smells " + ogreCount + " ogre(s).";
 			gameVars.outputElement.innerHTML += "  The elf's sniff powers are gone.";
 		}
 	};
