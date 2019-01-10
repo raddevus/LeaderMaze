@@ -696,9 +696,16 @@ function setPlayerStartPositions(){
 	
 }
 
+function setPlayerRoomLocation(player){
+	// this method is used so I can easily know where
+	// the player token was originally located (before the user moved it)
+	// It will help me put the token back in it's location if the user moves
+	// the token improperly
+	player.currentRoom = hitTestRoom(player,gameVars.allRooms);
+}
+
 function mouseDownHandler(event)
 {
-
 	var currentPoint = getMousePos(event);
 	// barricades are added so that later added barricades have a higher z-order
 	// that means if one is on top of the other the later added one will also
@@ -719,6 +726,7 @@ function mouseDownHandler(event)
 		currentToken.idx = tokenCount;
 		gameVars.hoverToken = currentToken;
 		gameVars.allPlayers[tokenCount].setToken(currentToken);
+		setPlayerRoomLocation(gameVars.allPlayers[tokenCount]);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		gameVars.mouseIsCaptured = true;
 		window.addEventListener("mouseup",mouseUpHandler);
@@ -902,25 +910,45 @@ function placePlayerInRoom(inPlayer, inRoom){
 	}
 }
 
+function playerCanMoveToTargetRoom(inPlayer,targetRoom){
+	var adjacentRoomIndexes = getAdjacentRoomIndexes(inPlayer.currentRoom);
+	var possibleRoomLocations = [];
+	for (var x = 0; x < adjacentRoomIndexes.length;x++){
+		possibleRoomLocations.push(adjacentRoomIndexes[x]+1);
+	}
+	for (var x = 0; x < possibleRoomLocations.length;x++){
+		if (possibleRoomLocations[x] == targetRoom.location){
+			return true;
+		}
+	}
+	return false;
+}
+
 function playerMovementHandler(playerTokenIdx){
 	var output = document.getElementById("output");
 	var currentPlayer = gameVars.allPlayers[playerTokenIdx];
-	var localRoom = hitTestRoom(currentPlayer,gameVars.allRooms);
+	var targetRoom = hitTestRoom(currentPlayer,gameVars.allRooms);
 
-	if (localRoom == null) { 
-		return; // couldn't get localRoom -- this is because of current issue with landing between rooms.
+	if (targetRoom == null) {
+		return; // couldn't get targetRoom -- this is because of current issue with landing between rooms.
 	}
 
-	placePlayerInRoom(currentPlayer, localRoom);
+	if (playerCanMoveToTargetRoom(currentPlayer, targetRoom)){
+		placePlayerInRoom(currentPlayer, targetRoom);
+	}
+	else{
+		placePlayerInRoom(currentPlayer, currentPlayer.currentRoom);
+		return;
+	}
 
-	output.innerHTML = currentPlayer.characterType + " moved into localRoom " + localRoom.location;
-	if (localRoom.location == gameVars.GRID_SIZE){
+	output.innerHTML = currentPlayer.characterType + " moved into room " + targetRoom.location;
+	if (targetRoom.location == gameVars.GRID_SIZE){
 		output.innerHTML += "  You've won!";
 	}
-	if (localRoom.hasOgre){
+	if (targetRoom.hasOgre){
 		if (currentPlayer.characterType == "barbarian" && currentPlayer.hasSpecialAbility){
 			output.innerHTML += " You barbarian! You've killed an ogre. Beware! You will not survive the next ogre you meet.";
-			localRoom.hasOgre = false;
+			targetRoom.hasOgre = false;
 			currentPlayer.hasSpecialAbility = false;
 		}
 		else{
@@ -931,10 +959,10 @@ function playerMovementHandler(playerTokenIdx){
 		}
 	}
 	
-	if (localRoom.hasTrap){
+	if (targetRoom.hasTrap){
 		if (currentPlayer.characterType == "thief" && currentPlayer.hasSpecialAbility){
 			output.innerHTML += "  You thief! You've disarmed a trap.  Beware! You will not survive the next trap you find.";
-			localRoom.hasTrap = false;
+			targetRoom.hasTrap = false;
 			currentPlayer.hasSpecialAbility = false;
 		}
 		else{
@@ -1122,6 +1150,8 @@ function  player (initData){
 	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
 	this.characterType = initData.characterType;
 	this.hasSpecialAbility = initData.hasAbility;
+	// location is the room.location where the player was when the token was clicked (mousedownHandler)
+	this.currentRoom = null;
 	this.token = initData.token;
 	this.setToken = function (token){
 		this.token = token;
