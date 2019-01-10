@@ -529,6 +529,12 @@ function gameItem(initData){
 		this.token = token;
 	};
 	this.sniff = function (actionRoom){
+		var elf = gameVars.allPlayers[3];
+		elf.location = hitTestRoom(elf,gameVars.allRooms).location;
+		if (actionRoom.location != elf.location){
+			gameVars.outputElement.innerHTML = "The elf cannot sniff that room (" + actionRoom.location +  ") because elf is in room " + elf.location + ". Please try again.";
+			return;
+		}
 		if (this.useCounter < 2){
 			this.useCounter++;
 			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Ogres will be revealed.";
