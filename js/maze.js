@@ -111,6 +111,7 @@ function placeOgresAndTraps(){
 function addOgresAndTrapsToRooms(){
 	for (var o = 0; o < gameVars.ogres.length; o++){
 		gameVars.allRooms[gameVars.ogres[o]-1].hasOgre = true;
+		gameVars.allRooms[gameVars.ogres[o]-1].isOgreDead = false;
 	}
 	for (var t = 0; t < gameVars.traps.length; t++){
 		gameVars.allRooms[gameVars.traps[t]-1].hasTrap = true;
@@ -537,7 +538,7 @@ function gameItem(initData){
 		if (this.useCounter < gameVars.MAX_SNIFFS){
 			this.useCounter++;
 			var ogreCount = getOgreCount(actionRoom);
-			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". There are " + ogreCount + " ogre(s) in the adjacent rooms.";
+			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Elf smells " + ogreCount + " ogre(s).";
 		}
 		else{
 			removeGameItem(this.type);
@@ -561,6 +562,9 @@ function getOgreCount(actionRoom){
 	var adjacentIndexes = getAdjacentRoomIndexes(actionRoom);
 	console.log(adjacentIndexes);
 	var ogreCounter = 0;
+	if (actionRoom.hasOgre){
+		ogreCounter++;
+	}
 	for (var z = 0; z < adjacentIndexes.length;z++){
 		if (gameVars.allRooms[adjacentIndexes[z]].hasOgre){
 			ogreCounter++;
@@ -945,10 +949,10 @@ function playerMovementHandler(playerTokenIdx){
 	if (targetRoom.location == gameVars.GRID_SIZE){
 		output.innerHTML += "  You've won!";
 	}
-	if (targetRoom.hasOgre){
+	if (!targetRoom.isOgreDead){
 		if (currentPlayer.characterType == "barbarian" && currentPlayer.hasSpecialAbility){
 			output.innerHTML += " You barbarian! You've killed an ogre. Beware! You will not survive the next ogre you meet.";
-			targetRoom.hasOgre = false;
+			targetRoom.isOgreDead = true;
 			currentPlayer.hasSpecialAbility = false;
 		}
 		else{
@@ -1010,7 +1014,6 @@ function drawRevealedChallenges(){
 }
 
 function gameItemDropHandler(tokenIdx){
-	
 	var gameItem = gameVars.allGameItems[tokenIdx];
 	var actionRoom = hitTestRoom(gameItem, gameVars.allRooms);
 	if (actionRoom == null){
@@ -1025,7 +1028,12 @@ function gameItemDropHandler(tokenIdx){
 		output.innerHTML = "The wizard has just cast a GREATER knowledge spell on room " + actionRoom.location + ".";
 
 		if (actionRoom.hasOgre){
-			output.innerHTML += " Beware! The room has an ogre.";
+			if (!actionRoom.isOgreDead){
+				output.innerHTML += " Beware! The room has a living ogre.  And, he's an angry ogre.";
+			}
+			if (actionRoom.isOgreDead){
+				output.innerHTML += " There is an ogre here, but no worries since that ogre is dead.";
+			}
 			gameVars.revealedItemRoomIndexes.push(actionRoom.location-1);
 			drawRevealedChallenges();
 		}
@@ -1037,6 +1045,7 @@ function gameItemDropHandler(tokenIdx){
 		if (!actionRoom.hasTrap && !actionRoom.hasOgre){
 			output.innerHTML += " The room contains no challenges.";
 		}
+
 		removeGameItem(gameItem.type);
 	}
 	
@@ -1185,6 +1194,7 @@ function room(roomInfo){
 	this.init = function(){
 		this.isPath = false; // it isn't on path until a path is generated
 		this.hasOgre = false;
+		this.isOgreDead = true;
 		this.hasTrap = false;
 		// ###### If this is the first row, set up directions
 		if (this.row == 1){
