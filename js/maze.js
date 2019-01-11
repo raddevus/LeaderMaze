@@ -715,8 +715,12 @@ function mouseDownHandler(event)
 
 
 	if (gameVars.lesserIsActivated){
-		//hitTestRoom(currentRoom
-		//return;
+		gameVars.lesserClickCount++;
+		gameVars.highlightedRooms.push(hitTestRoom(currentPoint, gameVars.allRooms));
+		if (gameVars.lesserClickCount >= 3){
+			gameVars.lesserIsActivated = false;
+		}
+		return;
 	}
 
 	// barricades are added so that later added barricades have a higher z-order
@@ -768,8 +772,13 @@ function mouseDownHandler(event)
 	}
 }
 
+function startClock(){
+	gameVars.gameclockSecondCounter = 0;
+	gameVars.gameclockHandle = setInterval(updateGameClock, 1000);
+}
+
 function stopClock(){
-	clearInterval(gameVars.gameclockHandle);
+	clearInterval(gameVars.gameclockHandle, updateGameClock);
 }
 
 
@@ -782,18 +791,34 @@ function updateGameClock(){
 function hitTestRoom(gameAsset, rooms){
 	// pass in player or gameItem object and check which room the player or item has moved to
 	// returns room where player has moved her token
-	
-	for (var k = 0;k < rooms.length; k++)
-	{
-		var testObjXmax = rooms[k].maxPoint.x;
-		var testObjYmax = rooms[k].maxPoint.y;
-		if ( (((gameAsset.token.gridLocation.x + (gameAsset.token.size /2)) >= rooms[k].minPoint.x) && ((gameAsset.token.gridLocation.x + (gameAsset.token.size /2))<= testObjXmax)) && 
-			(((gameAsset.token.gridLocation.y + (gameAsset.token.size / 2)) >= rooms[k].minPoint.y) && ((gameAsset.token.gridLocation.y + (gameAsset.token.size / 2)) <= testObjYmax)))
+	// gameAsset doesn't have an x but a point does - this differentiates between the two
+	if (gameAsset.x == undefined){
+		for (var k = 0;k < rooms.length; k++)
 		{
-			return rooms[k];
+			var testObjXmax = rooms[k].maxPoint.x;
+			var testObjYmax = rooms[k].maxPoint.y;
+			if ( (((gameAsset.token.gridLocation.x + (gameAsset.token.size /2)) >= rooms[k].minPoint.x) && ((gameAsset.token.gridLocation.x + (gameAsset.token.size /2))<= testObjXmax)) &&
+				(((gameAsset.token.gridLocation.y + (gameAsset.token.size / 2)) >= rooms[k].minPoint.y) && ((gameAsset.token.gridLocation.y + (gameAsset.token.size / 2)) <= testObjYmax)))
+			{
+				return rooms[k];
+			}
 		}
+		return null;
 	}
-	return null;
+	else{
+		// handles the case when a point is sent in
+		for (var k = 0;k < rooms.length; k++)
+			{
+				var testObjXmax = rooms[k].maxPoint.x;
+				var testObjYmax = rooms[k].maxPoint.y;
+				if (((gameAsset.x  >= rooms[k].minPoint.x) && (gameAsset.x <= testObjXmax)) &&
+					((gameAsset.y >= rooms[k].minPoint.y) && (gameAsset.y <= testObjYmax)))
+				{
+					return rooms[k];
+				}
+			}
+			return null;
+	}
 }
 
 function getAdjacentRoomIndexes(roomToCheck){
@@ -1147,6 +1172,7 @@ function GameVars (){
 
 	this.playerTokenIdx = -1;
 	this.gameItemTokenIdx = -1;
+	this.lesserClickCount = 0;
 	this.lesserIsActivated = false;
 
 	// we have a scoreboard that takes up the top 50px so 
