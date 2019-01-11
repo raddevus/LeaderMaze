@@ -847,7 +847,7 @@ function getAdjacentRoomIndexes(roomToCheck){
 				if (roomToCheck.doors[x] == 1){
 					// exit to north
 					// -6 to any idx is movement north but we need idx so we subtract 1 extra
-					adjacentRoomIndexes.push(roomToCheck.location - 7);
+					adjacentRoomIndexes.push(roomToCheck.location - (gameVars.MAX_COLS+1));
 				}
 				break;
 			}
@@ -855,7 +855,7 @@ function getAdjacentRoomIndexes(roomToCheck){
 				if (roomToCheck.doors[x] == 1){
 					// exit to south
 					// + 6 to any index is a movement south, but only need +5 since location is idx + 1
-					adjacentRoomIndexes.push(roomToCheck.location + 5);
+					adjacentRoomIndexes.push(roomToCheck.location + (gameVars.MAX_COLS-1));
 				}
 				break;
 			}
