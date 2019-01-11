@@ -709,6 +709,20 @@ function setPlayerRoomLocation(player){
 	player.currentRoom = hitTestRoom(player,gameVars.allRooms);
 }
 
+function reportChallenges(){
+	var ogreCount = 0;
+	var trapCount = 0;
+	for (var x = 0; x < gameVars.highlightedRooms.length;x++){
+		if (gameVars.highlightedRooms[x].hasOgre){
+			ogreCount++;
+		}
+		if (gameVars.highlightedRooms[x].hasTrap){
+			trapCount++;
+		}
+	gameVars.outputElement.innerHTML = "Lesser spell reveals " + ogreCount + " ogre(s) and " + trapCount + " trap(s)."
+	}
+}
+
 function mouseDownHandler(event)
 {
 	var currentPoint = getMousePos(event);
@@ -717,8 +731,10 @@ function mouseDownHandler(event)
 	if (gameVars.lesserIsActivated){
 		gameVars.lesserClickCount++;
 		gameVars.highlightedRooms.push(hitTestRoom(currentPoint, gameVars.allRooms));
+		draw();
 		if (gameVars.lesserClickCount >= 3){
 			gameVars.lesserIsActivated = false;
+			reportChallenges();
 		}
 		return;
 	}
