@@ -3,6 +3,11 @@
 // #########################################################################
 // ###################  THESE ARE ALL THE SPECIAL TYPES USED THROUGHOUT ####
 // #########################################################################
+var gameVars = GameVars();
+
+function getMainGameVars(){
+	return gameVars;
+}
 
 function GameVars (){
 	this.n = 0;
@@ -66,7 +71,7 @@ function GameVars (){
 	console.log("after window.addEventListener(load, initApp)");
 	return this;
 }
-let gameVars = GameVars();
+
 function  player (initData){
 	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
 	this.characterType = initData.characterType;
@@ -96,18 +101,19 @@ function room(roomInfo){
 	this.visited = this.location == 1 ? true : false;
 	
 	this.doors = [0,0,0,0];
-	this.column = this.getColumnNumber(this.location);
-	this.row = this.getRowNumber(this.location);
+	
 	this.textLocationX = (this.column *(gameVars.lineInterval )) - (gameVars.lineInterval /2);
 	this.textLocationY = (this.row * (gameVars.lineInterval )) - (gameVars.lineInterval /2);
 	this.minPoint = new point ((this.column-1) * gameVars.lineInterval, (this.row-1)*gameVars.lineInterval);
-	this.maxPoint = new point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);;
+	this.maxPoint = new point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);
 	
 	this.init = function(){
 		this.isPath = false; // it isn't on path until a path is generated
 		this.hasOgre = false;
 		this.isOgreDead = true;
 		this.hasTrap = false;
+		this.column = getColumnNumber(this.location);
+		this.row = getRowNumber(this.location);
 		// ###### If this is the first row, set up directions
 		if (this.row == 1){
 			this.doors[gameVars.s] = 1;
@@ -149,7 +155,7 @@ function room(roomInfo){
 				this.doors[gameVars.e] = 1;
 			}
 		}
-		this.getColumnNumber = function(location){
+		function getColumnNumber(location){
 			for (var x =0; x < gameVars.rows.length;x++){
 				if (gameVars.rows[x] - location >= 0){
 					var col = x+1;
@@ -162,7 +168,8 @@ function room(roomInfo){
 				}
 			}
 		}
-		this.getRowNumber = function (location){
+		
+		function getRowNumber(location){
 			for (var x =0; x < gameVars.cols.length;x++){
 				if (gameVars.cols[x] - location >= 0){
 					// return column number as index + 1
