@@ -3,30 +3,65 @@
 // #########################################################################
 // ###################  THESE ARE ALL THE SPECIAL TYPES USED THROUGHOUT ####
 // #########################################################################
-var gameVars = GameVars();
 
-function getMainGameVars(){
-	return gameVars;
-}
+class GameVars {
+	n : number;
+	s : number;
+	e : number;
+	w : number;
+	allGameItems : [] = [];
+	allPlayers : [] = [];
+	allRooms : [] = [];
+	cols : [] = [];
+	ogres : [] = [];
+	path : [] = [];
+	possibleOgresAndTraps : [] = [];
+	rows : [] = [];
+	traps : [] = [];
+	unblockedRooms : [] = [];
+	revealedItemRoomIndexes : [] = [];
+	highlightedRooms : [] = [];
+	
+	pathIndexer : number;
+	// hoverToken -- token being hovered over with mouse
+	hoverToken : token;
+	
+	gameclockSecondCounter : number;
+	gameclockHandle : object;
 
-function GameVars (){
+	playerTokenIdx : number;
+	gameItemTokenIdx :number ;
+	lesserClickCount : number;
+	lesserIsActivated : boolean;
+	
+	currentRoom : object;
+	maxColElement : HTMLElement;
+	challengesCheck : object;
+	outputElement : HTMLElement;
+	superstar : number;
+	isChallengesDisplayed : boolean;
+	MAX_COLS : number;
+	GRID_SIZE : number;
+	PREV_COL_SIZE : number;
+	MAX_ATTEMPTS :number;
+	MAX_OGRES_TRAPS : number;
+	MAX_SNIFFS : number;
+	solutionAttempts : number;
+	// path is an array of rooms used by generatePath()
+
+	ctx : object;
+	theCanvas : object;
+	linenumbererval : number;
+
+	mouseIsCaptured : boolean;
+
+	
+    constructor(){
 	this.n = 0;
 	this.s = 1;
 	this.e = 2;
 	this.w = 3;
-
-	this.allGameItems = [];
-	this.allPlayers = [];
-	this.allRooms = [];
-	this.cols = [];
-	this.ogres = [];
-	this.path = [];
-	this.possibleOgresAndTraps = [];
-	this.rows = [];
-	this.traps = [];
-	this.unblockedRooms = [];
-	this.revealedItemRoomIndexes = [];
-	this.highlightedRooms = [];
+	
 
 	this.pathIndexer = 0;
 	// hoverToken -- token being hovered over with mouse
@@ -51,7 +86,7 @@ function GameVars (){
 	this.outputElement = document.getElementById("output");
 	this.superstar = 33;
 	this.isChallengesDisplayed = true;
-	this.MAX_COLS = Number(this.maxColElement.value);
+	this.MAX_COLS = Number((<HTMLInputElement>(this.maxColElement)).value);
 	this.GRID_SIZE = this.MAX_COLS*this.MAX_COLS;
 	this.PREV_COL_SIZE = this.MAX_COLS;
 	this.MAX_ATTEMPTS = 500;
@@ -62,15 +97,18 @@ function GameVars (){
 
 	this.ctx = null;
 	this.theCanvas = null;
-	this.lineInterval = 0;
+	this.linenumbererval = 0;
 
 	this.mouseIsCaptured = false;
 
 	console.log("before initapp...");
 	//initApp();
 	console.log("after window.addEventListener(load, initApp)");
-	return this;
+	}
+	//return this;
 }
+
+var gameVars = new GameVars();
 
 function  player (initData){
 	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
@@ -84,10 +122,14 @@ function  player (initData){
 	};
 }
 
-function point(x,y)
+class point
 {
-	this.x = x;
-	this.y = y;
+	x : number;
+	y : number;
+	constructor (x: number, y : number){
+		this.x = x;
+		this.y = y;
+	}
 }
 
 function room(roomInfo){
@@ -102,10 +144,10 @@ function room(roomInfo){
 	
 	this.doors = [0,0,0,0];
 	
-	this.textLocationX = (this.column *(gameVars.lineInterval )) - (gameVars.lineInterval /2);
-	this.textLocationY = (this.row * (gameVars.lineInterval )) - (gameVars.lineInterval /2);
-	this.minPoint = new point ((this.column-1) * gameVars.lineInterval, (this.row-1)*gameVars.lineInterval);
-	this.maxPoint = new point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);
+	this.textLocationX = (this.column *(gameVars.linenumbererval )) - (gameVars.linenumbererval /2);
+	this.textLocationY = (this.row * (gameVars.linenumbererval )) - (gameVars.linenumbererval /2);
+	this.minPoint = new point ((this.column-1) * gameVars.linenumbererval, (this.row-1)*gameVars.linenumbererval);
+	this.maxPoint = new point ((this.column) * gameVars.linenumbererval, (this.row)*gameVars.linenumbererval);
 	
 	this.init = function(){
 		this.isPath = false; // it isn't on path until a path is generated
@@ -192,15 +234,24 @@ function gridlocation(value){
     this.y = value.y
 }
 
-function token(userToken){
-	// represents the users onscreen token
-	if (userToken !== undefined){
-    this.size = userToken.size;
-    this.imgSourceX = userToken.imgSourceX;
-    this.imgSourceY = userToken.imgSourceY;
-    this.imgSourceSize = userToken.imgSourceSize;
-    this.imgIdTag = userToken.imgIdTag;
-    this.gridLocation = userToken.gridLocation;
+class token{
+	size : point;
+	imgSourceX : number;
+	imgSourceY : number;
+	imgSourceSize : number;
+	imgIdTag : string;
+	gridLocation : point;
+	
+	constructor (userToken : token){
+		// represents the users onscreen token
+		if (userToken !== undefined){
+		this.size = userToken.size;
+		this.imgSourceX = userToken.imgSourceX;
+		this.imgSourceY = userToken.imgSourceY;
+		this.imgSourceSize = userToken.imgSourceSize;
+		this.imgIdTag = userToken.imgIdTag;
+		this.gridLocation = userToken.gridLocation;
+		}
 	}
 }
 

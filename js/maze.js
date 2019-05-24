@@ -348,7 +348,6 @@ function initApp()
 {
 	console.log("in initapp...");
 	//window.gameVars = new GameVars();
-	window.gameVars = getMainGameVars();
 
 	initGrid();	
 	

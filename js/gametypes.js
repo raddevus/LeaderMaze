@@ -3,62 +3,61 @@
 // #########################################################################
 // ###################  THESE ARE ALL THE SPECIAL TYPES USED THROUGHOUT ####
 // #########################################################################
-var gameVars = GameVars();
-function getMainGameVars() {
-    return gameVars;
-}
-function GameVars() {
-    this.n = 0;
-    this.s = 1;
-    this.e = 2;
-    this.w = 3;
-    this.allGameItems = [];
-    this.allPlayers = [];
-    this.allRooms = [];
-    this.cols = [];
-    this.ogres = [];
-    this.path = [];
-    this.possibleOgresAndTraps = [];
-    this.rows = [];
-    this.traps = [];
-    this.unblockedRooms = [];
-    this.revealedItemRoomIndexes = [];
-    this.highlightedRooms = [];
-    this.pathIndexer = 0;
-    // hoverToken -- token being hovered over with mouse
-    this.hoverToken = null;
-    this.gameclockSecondCounter = 0;
-    this.gameclockHandle = null;
-    this.playerTokenIdx = -1;
-    this.gameItemTokenIdx = -1;
-    this.lesserClickCount = 0;
-    this.lesserIsActivated = false;
-    // we have a scoreboard that takes up the top 50px so 
-    // the canvas is always offset by 50px (value is set up in css scoreboard element)
-    //this.gridTopOffset = 50;
-    this.currentRoom = null;
-    this.maxColElement = document.getElementById("maxCols");
-    this.challengesCheck = document.getElementById("challengesCheck");
-    this.outputElement = document.getElementById("output");
-    this.superstar = 33;
-    this.isChallengesDisplayed = true;
-    this.MAX_COLS = Number(this.maxColElement.value);
-    this.GRID_SIZE = this.MAX_COLS * this.MAX_COLS;
-    this.PREV_COL_SIZE = this.MAX_COLS;
-    this.MAX_ATTEMPTS = 500;
-    this.MAX_OGRES_TRAPS = 5;
-    this.MAX_SNIFFS = 3;
-    this.solutionAttempts = 0;
-    // path is an array of rooms used by generatePath()
-    this.ctx = null;
-    this.theCanvas = null;
-    this.lineInterval = 0;
-    this.mouseIsCaptured = false;
-    console.log("before initapp...");
-    //initApp();
-    console.log("after window.addEventListener(load, initApp)");
-    return this;
-}
+var GameVars = /** @class */ (function () {
+    function GameVars() {
+        this.allGameItems = [];
+        this.allPlayers = [];
+        this.allRooms = [];
+        this.cols = [];
+        this.ogres = [];
+        this.path = [];
+        this.possibleOgresAndTraps = [];
+        this.rows = [];
+        this.traps = [];
+        this.unblockedRooms = [];
+        this.revealedItemRoomIndexes = [];
+        this.highlightedRooms = [];
+        this.n = 0;
+        this.s = 1;
+        this.e = 2;
+        this.w = 3;
+        this.pathIndexer = 0;
+        // hoverToken -- token being hovered over with mouse
+        this.hoverToken = null;
+        this.gameclockSecondCounter = 0;
+        this.gameclockHandle = null;
+        this.playerTokenIdx = -1;
+        this.gameItemTokenIdx = -1;
+        this.lesserClickCount = 0;
+        this.lesserIsActivated = false;
+        // we have a scoreboard that takes up the top 50px so 
+        // the canvas is always offset by 50px (value is set up in css scoreboard element)
+        //this.gridTopOffset = 50;
+        this.currentRoom = null;
+        this.maxColElement = document.getElementById("maxCols");
+        this.challengesCheck = document.getElementById("challengesCheck");
+        this.outputElement = document.getElementById("output");
+        this.superstar = 33;
+        this.isChallengesDisplayed = true;
+        this.MAX_COLS = Number((this.maxColElement).value);
+        this.GRID_SIZE = this.MAX_COLS * this.MAX_COLS;
+        this.PREV_COL_SIZE = this.MAX_COLS;
+        this.MAX_ATTEMPTS = 500;
+        this.MAX_OGRES_TRAPS = 5;
+        this.MAX_SNIFFS = 3;
+        this.solutionAttempts = 0;
+        // path is an array of rooms used by generatePath()
+        this.ctx = null;
+        this.theCanvas = null;
+        this.linenumbererval = 0;
+        this.mouseIsCaptured = false;
+        console.log("before initapp...");
+        //initApp();
+        console.log("after window.addEventListener(load, initApp)");
+    }
+    return GameVars;
+}());
+var gameVars = new GameVars();
 function player(initData) {
     // characterType is one of the following:  barbarian, wizard, thief, elf, leader
     this.characterType = initData.characterType;
@@ -70,10 +69,13 @@ function player(initData) {
         this.token = token;
     };
 }
-function point(x, y) {
-    this.x = x;
-    this.y = y;
-}
+var point = /** @class */ (function () {
+    function point(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    return point;
+}());
 function room(roomInfo) {
     // location is a value from 1 to gameVars.MAX_COLS
     if (roomInfo != undefined && roomInfo != null) {
@@ -84,10 +86,10 @@ function room(roomInfo) {
     // room 1 is always initially visited since that is where user starts
     this.visited = this.location == 1 ? true : false;
     this.doors = [0, 0, 0, 0];
-    this.textLocationX = (this.column * (gameVars.lineInterval)) - (gameVars.lineInterval / 2);
-    this.textLocationY = (this.row * (gameVars.lineInterval)) - (gameVars.lineInterval / 2);
-    this.minPoint = new point((this.column - 1) * gameVars.lineInterval, (this.row - 1) * gameVars.lineInterval);
-    this.maxPoint = new point((this.column) * gameVars.lineInterval, (this.row) * gameVars.lineInterval);
+    this.textLocationX = (this.column * (gameVars.linenumbererval)) - (gameVars.linenumbererval / 2);
+    this.textLocationY = (this.row * (gameVars.linenumbererval)) - (gameVars.linenumbererval / 2);
+    this.minPoint = new point((this.column - 1) * gameVars.linenumbererval, (this.row - 1) * gameVars.linenumbererval);
+    this.maxPoint = new point((this.column) * gameVars.linenumbererval, (this.row) * gameVars.linenumbererval);
     this.init = function () {
         this.isPath = false; // it isn't on path until a path is generated
         this.hasOgre = false;
@@ -165,17 +167,20 @@ function gridlocation(value) {
     this.x = value.x;
     this.y = value.y;
 }
-function token(userToken) {
-    // represents the users onscreen token
-    if (userToken !== undefined) {
-        this.size = userToken.size;
-        this.imgSourceX = userToken.imgSourceX;
-        this.imgSourceY = userToken.imgSourceY;
-        this.imgSourceSize = userToken.imgSourceSize;
-        this.imgIdTag = userToken.imgIdTag;
-        this.gridLocation = userToken.gridLocation;
+var token = /** @class */ (function () {
+    function token(userToken) {
+        // represents the users onscreen token
+        if (userToken !== undefined) {
+            this.size = userToken.size;
+            this.imgSourceX = userToken.imgSourceX;
+            this.imgSourceY = userToken.imgSourceY;
+            this.imgSourceSize = userToken.imgSourceSize;
+            this.imgIdTag = userToken.imgIdTag;
+            this.gridLocation = userToken.gridLocation;
+        }
     }
-}
+    return token;
+}());
 // ########################## END OF SPECIAL TYPES #########################
 // #########################################################################
 // #########################################################################
