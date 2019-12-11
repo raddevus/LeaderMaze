@@ -169,6 +169,9 @@ function generatePath(){
 		// 1 = s (add one to row)
 		// 2 = e (add one to column)
 		// 3 = w (subtract one from column)
+		console.log(gameVars);
+		console.log(gameVars.allRooms.length);
+		console.log(gameVars.MAX_COLS);
 		switch (doorIndex){
 			case 0 : {
 				if (!gameVars.allRooms[(gameVars.currentRoom.location -1) - gameVars.MAX_COLS].isPath
