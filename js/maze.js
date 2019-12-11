@@ -679,9 +679,9 @@ function initPlayers(){
 }
 
 function initGameItems(){
-	gameVars.allGameItems.push(new gameItem({type:"lesser", token: new token()}));
-	gameVars.allGameItems.push(new gameItem({type:"sniff", token: new token()}));
 	gameVars.allGameItems.push(new gameItem({type:"greater", token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"sniff", token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"lesser", token: new token()}));
 }
 
 function setPlayerStartPositions(){
@@ -719,7 +719,7 @@ function reportChallenges(){
 		if (gameVars.highlightedRooms[x].hasTrap){
 			trapCount++;
 		}
-	gameVars.outputElement.innerHTML = "Lesser spell reveals " + ogreCount + " ogre(s) and " + trapCount + " trap(s)."
+	gameVars.outputElement.innerHTML = "GREATER spell reveals " + ogreCount + " ogre(s) and " + trapCount + " trap(s)."
 	}
 }
 
@@ -728,12 +728,12 @@ function mouseDownHandler(event)
 	var currentPoint = getMousePos(event);
 
 
-	if (gameVars.lesserIsActivated){
-		gameVars.lesserClickCount++;
+	if (gameVars.greaterIsActivated){
+		gameVars.greaterClickCount++;
 		gameVars.highlightedRooms.push(hitTestRoom(currentPoint, gameVars.allRooms));
 		draw();
-		if (gameVars.lesserClickCount >= 3){
-			gameVars.lesserIsActivated = false;
+		if (gameVars.greaterClickCount >= 3){
+			gameVars.greaterIsActivated = false;
 			reportChallenges();
 		}
 		return;
@@ -906,8 +906,8 @@ function setPlayerDead(player){
 				removeGameItem("sniff");
 			}
 			if (player.characterType == "wizard"){
-				removeGameItem("lesser");
 				removeGameItem("greater");
+				removeGameItem("lesser");
 			}
 			return;
 		}
@@ -1073,8 +1073,8 @@ function gameItemDropHandler(tokenIdx){
 		placeGameItemInRoom(gameItem,actionRoom);
 		gameItem.sniff(actionRoom);
 	}
-	if (gameItem.type == "greater"){
-		output.innerHTML = "The wizard has just cast a GREATER knowledge spell on room " + actionRoom.location + ".";
+	if (gameItem.type == "lesser"){
+		output.innerHTML = "The wizard has just cast a LESSER knowledge spell on room " + actionRoom.location + ".";
 
 		if (actionRoom.hasOgre){
 			if (!actionRoom.isOgreDead){
@@ -1098,9 +1098,9 @@ function gameItemDropHandler(tokenIdx){
 		removeGameItem(gameItem.type);
 	}
 	
-	if (gameItem.type == "lesser"){
-		output.innerHTML = "The wizard has just cast a LESSER knowledge spell on room " + actionRoom.location + ".  Please click three other rooms.";
-		gameVars.lesserIsActivated = true;
+	if (gameItem.type == "greater"){
+		output.innerHTML = "The wizard has just cast a GREATER knowledge spell on room " + actionRoom.location + ".  Please click three other rooms.";
+		gameVars.greaterIsActivated = true;
 		gameVars.highlightedRooms.push(actionRoom);
 		//drawhighlightedRooms();
 		removeGameItem(gameItem.type);
@@ -1188,8 +1188,8 @@ function GameVars (){
 
 	this.playerTokenIdx = -1;
 	this.gameItemTokenIdx = -1;
-	this.lesserClickCount = 0;
-	this.lesserIsActivated = false;
+	this.greaterClickCount = 0;
+	this.greaterIsActivated = false;
 
 	// we have a scoreboard that takes up the top 50px so 
 	// the canvas is always offset by 50px (value is set up in css scoreboard element)
