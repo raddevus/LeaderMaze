@@ -579,7 +579,7 @@ function initTokens(iconSize,sizeInBitmap,iconCount,imageIdTag,targetArray){
 	// add a token to each player
 	for (var i = 0; i < iconCount;i++)
 	{
-		currentToken = new token({
+		currentToken = new Token({
 				size:iconSize,
 				imgSourceX:i*sizeInBitmap,
 				imgSourceY:0*sizeInBitmap,
@@ -671,17 +671,17 @@ function hitTest(mouseLocation, hitTestObject)
 }
 
 function initPlayers(){
-	gameVars.allPlayers.push (new player({characterType: "barbarian", hasAbility: true, token: new token()})); 
-	gameVars.allPlayers.push (new player({characterType: "wizard", hasAbility: false, token: new token()})); 
-	gameVars.allPlayers.push (new player({characterType: "thief", hasAbility: true, token: new token()})); 
-	gameVars.allPlayers.push (new player({characterType: "elf", hasAbility: false, token: new token()})); 
-	gameVars.allPlayers.push (new player({characterType: "leader", hasAbility: false, token: new token()})); 
+	gameVars.allPlayers.push (new Player({characterType: "barbarian", hasAbility: true, token: new Token()})); 
+	gameVars.allPlayers.push (new Player({characterType: "wizard", hasAbility: false, token: new Token()})); 
+	gameVars.allPlayers.push (new Player({characterType: "thief", hasAbility: true, token: new Token()})); 
+	gameVars.allPlayers.push (new Player({characterType: "elf", hasAbility: false, token: new Token()})); 
+	gameVars.allPlayers.push (new Player({characterType: "leader", hasAbility: false, token: new Token()})); 
 }
 
 function initGameItems(){
-	gameVars.allGameItems.push(new gameItem({type:"greater", token: new token()}));
-	gameVars.allGameItems.push(new gameItem({type:"sniff", token: new token()}));
-	gameVars.allGameItems.push(new gameItem({type:"lesser", token: new token()}));
+	gameVars.allGameItems.push(new gameItem({type:"greater", token: new Token()}));
+	gameVars.allGameItems.push(new gameItem({type:"sniff", token: new Token()}));
+	gameVars.allGameItems.push(new gameItem({type:"lesser", token: new Token()}));
 }
 
 function setPlayerStartPositions(){
@@ -1222,16 +1222,18 @@ function GameVars (){
 	return this;
 }
 
-function  player (initData){
-	// characterType is one of the following:  barbarian, wizard, thief, elf, leader
-	this.characterType = initData.characterType;
-	this.hasSpecialAbility = initData.hasAbility;
-	// location is the room.location where the player was when the token was clicked (mousedownHandler)
-	this.currentRoom = null;
-	this.token = initData.token;
-	this.setToken = function (token){
-		this.token = token;
-	};
+class Player{
+	constructor(initData){
+		// characterType is one of the following:  barbarian, wizard, thief, elf, leader
+		this.characterType = initData.characterType;
+		this.hasSpecialAbility = initData.hasAbility;
+		// location is the room.location where the player was when the token was clicked (mousedownHandler)
+		this.currentRoom = null;
+		this.token = initData.token;
+		this.setToken = function (token){
+			this.token = token;
+		};
+	}
 }
 
 function point(x,y)
@@ -1318,15 +1320,18 @@ function gridlocation(value){
     this.y = value.y
 }
 
-function token(userToken){
-	// represents the users onscreen token
-	if (userToken !== undefined){
-    this.size = userToken.size;
-    this.imgSourceX = userToken.imgSourceX;
-    this.imgSourceY = userToken.imgSourceY;
-    this.imgSourceSize = userToken.imgSourceSize;
-    this.imgIdTag = userToken.imgIdTag;
-    this.gridLocation = userToken.gridLocation;
+class Token{
+	
+	constructor (userToken){
+		if (userToken !== undefined){
+			// represents the user's onscreen token
+			this.size = userToken.size;
+			this.imgSourceX = userToken.imgSourceX;
+			this.imgSourceY = userToken.imgSourceY;
+			this.imgSourceSize = userToken.imgSourceSize;
+			this.imgIdTag = userToken.imgIdTag;
+			this.gridLocation = userToken.gridLocation;	
+		}
 	}
 }
 
