@@ -1159,67 +1159,68 @@ function getMousePos(evt) {
 // ###################  THESE ARE ALL THE SPECIAL TYPES USED THROUGHOUT ####
 // #########################################################################
 
-function GameVars (){
-	this.n = 0;
-	this.s = 1;
-	this.e = 2;
-	this.w = 3;
+class GameVars{
+	constructor(){
+		this.n = 0;
+		this.s = 1;
+		this.e = 2;
+		this.w = 3;
 
-	this.allGameItems = [];
-	this.allPlayers = [];
-	this.allRooms = [];
-	this.cols = [];
-	this.ogres = [];
-	this.path = [];
-	this.possibleOgresAndTraps = [];
-	this.rows = [];
-	this.traps = [];
-	this.unblockedRooms = [];
-	this.revealedItemRoomIndexes = [];
-	this.highlightedRooms = [];
+		this.allGameItems = [];
+		this.allPlayers = [];
+		this.allRooms = [];
+		this.cols = [];
+		this.ogres = [];
+		this.path = [];
+		this.possibleOgresAndTraps = [];
+		this.rows = [];
+		this.traps = [];
+		this.unblockedRooms = [];
+		this.revealedItemRoomIndexes = [];
+		this.highlightedRooms = [];
 
-	this.pathIndexer = 0;
-	// hoverToken -- token being hovered over with mouse
-	this.hoverToken = null;
+		this.pathIndexer = 0;
+		// hoverToken -- token being hovered over with mouse
+		this.hoverToken = null;
 
 
-	this.gameclockSecondCounter = 0;
-	this.gameclockHandle = null;
+		this.gameclockSecondCounter = 0;
+		this.gameclockHandle = null;
 
-	this.playerTokenIdx = -1;
-	this.gameItemTokenIdx = -1;
-	this.greaterClickCount = 0;
-	this.greaterIsActivated = false;
+		this.playerTokenIdx = -1;
+		this.gameItemTokenIdx = -1;
+		this.greaterClickCount = 0;
+		this.greaterIsActivated = false;
 
-	// we have a scoreboard that takes up the top 50px so 
-	// the canvas is always offset by 50px (value is set up in css scoreboard element)
-	//this.gridTopOffset = 50;
+		// we have a scoreboard that takes up the top 50px so 
+		// the canvas is always offset by 50px (value is set up in css scoreboard element)
+		//this.gridTopOffset = 50;
 
-	this.currentRoom = null;
-	this.maxColElement = document.getElementById("maxCols");
-	this.challengesCheck = document.getElementById("challengesCheck");
-	this.outputElement = document.getElementById("output");
-	this.superstar = 33;
-	this.isChallengesDisplayed = true;
-	this.MAX_COLS = Number(this.maxColElement.value);
-	this.GRID_SIZE = this.MAX_COLS*this.MAX_COLS;
-	this.PREV_COL_SIZE = this.MAX_COLS;
-	this.MAX_ATTEMPTS = 500;
-	this.MAX_OGRES_TRAPS = 5;
-	this.MAX_SNIFFS = 3;
-	this.solutionAttempts = 0;
-	// path is an array of rooms used by generatePath()
+		this.currentRoom = null;
+		this.maxColElement = document.getElementById("maxCols");
+		this.challengesCheck = document.getElementById("challengesCheck");
+		this.outputElement = document.getElementById("output");
+		this.superstar = 33;
+		this.isChallengesDisplayed = true;
+		this.MAX_COLS = Number(this.maxColElement.value);
+		this.GRID_SIZE = this.MAX_COLS*this.MAX_COLS;
+		this.PREV_COL_SIZE = this.MAX_COLS;
+		this.MAX_ATTEMPTS = 500;
+		this.MAX_OGRES_TRAPS = 5;
+		this.MAX_SNIFFS = 3;
+		this.solutionAttempts = 0;
+		// path is an array of rooms used by generatePath()
 
-	this.ctx = null;
-	this.theCanvas = null;
-	this.lineInterval = 0;
+		this.ctx = null;
+		this.theCanvas = null;
+		this.lineInterval = 0;
 
-	this.mouseIsCaptured = false;
+		this.mouseIsCaptured = false;
 
-	console.log("before initapp...");
-	//initApp();
-	console.log("after window.addEventListener(load, initApp)");
-	return this;
+		console.log("before initapp...");
+		//initApp();
+		console.log("after window.addEventListener(load, initApp)");
+	}
 }
 
 class Player{
