@@ -1,7 +1,8 @@
 // maze.js
 "use strict";
+var gameVars = null;
 
-window.addEventListener("load",initApp);
+addEventListener("load",initApp);
 
 function initGrid(){
 	gameVars.PREV_COL_SIZE = gameVars.MAX_COLS;
@@ -351,14 +352,14 @@ function initUnblockedRooms(){
 
 function initCanvas(){
 	
-	gameVars.ctx.canvas.height  = (window.innerHeight - gameVars.lineInterval);
+	gameVars.ctx.canvas.height  = (innerHeight - gameVars.lineInterval);
 	gameVars.ctx.canvas.width = gameVars.ctx.canvas.height;
 	
 	gameVars.lineInterval = Math.floor(gameVars.ctx.canvas.width / gameVars.MAX_COLS);
 	
 	// the -5 in the two following lines makes the canvas area, just slightly smaller
 	// than the entire window.  this helps so the scrollbars do not appear.
-	gameVars.ctx.canvas.height  = (window.innerHeight-gameVars.lineInterval);
+	gameVars.ctx.canvas.height  = (innerHeight-gameVars.lineInterval);
 	gameVars.ctx.canvas.width = gameVars.ctx.canvas.height;
 	gameVars.ctx.strokeStyle = '#0000ff';
 
@@ -371,7 +372,7 @@ function initCanvas(){
 function initApp()
 {
 	console.log("in initapp...");
-	window.gameVars = new GameVars();
+	gameVars = new GameVars();
 
 	initGrid();	
 	
@@ -380,10 +381,10 @@ function initApp()
 	
 	initCanvas();
 	
-	window.addEventListener("resize", initApp);
-	window.addEventListener("orientationchange", initApp);
-	window.addEventListener("mousemove", mouseMoveHandler);
-    window.addEventListener("mousedown", mouseDownHandler);
+	addEventListener("resize", initApp);
+	addEventListener("orientationchange", initApp);
+	addEventListener("mousemove", mouseMoveHandler);
+    addEventListener("mousedown", mouseDownHandler);
 
 	initUnblockedRooms();
 	initPossibles();
@@ -763,7 +764,7 @@ function mouseDownHandler(event)
 		setPlayerRoomLocation(gameVars.allPlayers[tokenCount]);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		gameVars.mouseIsCaptured = true;
-		window.addEventListener("mouseup",mouseUpHandler);
+		addEventListener("mouseup",mouseUpHandler);
 		return;
 	  }
 	}
@@ -784,7 +785,7 @@ function mouseDownHandler(event)
 		gameVars.allGameItems[tokenCount].setToken(currentToken);
 		console.log("b.x : " + currentToken.gridLocation.x + "  b.y : " + currentToken.gridLocation.y);
 		gameVars.mouseIsCaptured = true;
-		window.addEventListener("mouseup",mouseUpHandler);
+		addEventListener("mouseup",mouseUpHandler);
 		return;
 	  }
 	}
@@ -1134,8 +1135,8 @@ function mouseUpHandler()
 		gameVars.allPlayers[j].token.isMoving = false;
 		
 	}
-	window.removeEventListener("mousemove", mouseDownHandler);
-	window.removeEventListener("mouseup", mouseUpHandler);
+	removeEventListener("mousemove", mouseDownHandler);
+	removeEventListener("mouseup", mouseUpHandler);
 	
 	if (gameVars.playerTokenIdx > -1){
 		playerMovementHandler(gameVars.playerTokenIdx);
@@ -1221,7 +1222,7 @@ class GameVars{
 
 		console.log("before initapp...");
 		//initApp();
-		console.log("after window.addEventListener(load, initApp)");
+		console.log("after addEventListener(load, initApp)");
 	}
 }
 
