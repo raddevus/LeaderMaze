@@ -521,15 +521,17 @@ function displayChallengesClicked(){
 	}
 }
 
-function gameItem(initData){
-	this.token = initData.token;
-	this.isAvailable = true;
-	this.type = initData.type;
-	this.useCounter = 1;
-	this.setToken = function (token){
+class GameItem{
+	constructor(initData){
+		this.token = initData.token;
+		this.isAvailable = true;
+		this.type = initData.type;
+		this.useCounter = 1;
+	}
+	setToken(token){
 		this.token = token;
-	};
-	this.sniff = function (actionRoom){
+	}
+	sniff(actionRoom){
 		var elf = getPlayerByCharacterType("elf");
 		elf.location = hitTestRoom(elf,gameVars.allRooms).location;
 		if (actionRoom.location != elf.location){
@@ -547,7 +549,7 @@ function gameItem(initData){
 			gameVars.outputElement.innerHTML = "The elf has just sniffed from room " + actionRoom.location + ". Elf smells " + ogreCount + " ogre(s).";
 			gameVars.outputElement.innerHTML += "  The elf's sniff powers are gone.";
 		}
-	};
+	}
 }
 
 function getPlayerByCharacterType(charType){
@@ -679,9 +681,9 @@ function initPlayers(){
 }
 
 function initGameItems(){
-	gameVars.allGameItems.push(new gameItem({type:"greater", token: new Token()}));
-	gameVars.allGameItems.push(new gameItem({type:"sniff", token: new Token()}));
-	gameVars.allGameItems.push(new gameItem({type:"lesser", token: new Token()}));
+	gameVars.allGameItems.push(new GameItem({type:"greater", token: new Token()}));
+	gameVars.allGameItems.push(new GameItem({type:"sniff", token: new Token()}));
+	gameVars.allGameItems.push(new GameItem({type:"lesser", token: new Token()}));
 }
 
 function setPlayerStartPositions(){
