@@ -237,7 +237,7 @@ function initializeRooms(){
 	initGrid();
 	
 	for (var i = 1; i <=gameVars.GRID_SIZE;i++){
-		gameVars.allRooms.push(new room({location:i}));
+		gameVars.allRooms.push(new Room({location:i}));
 		gameVars.allRooms[i-1].init();
 	}
 }
@@ -1240,25 +1240,25 @@ function point(x,y)
 	this.y = y;
 }
 
-function room(roomInfo){
-	// location is a value from 1 to gameVars.MAX_COLS
-	if (roomInfo != undefined && roomInfo != null){
-		//console.log("roomInfo.location : " + roomInfo.location);
+class Room{
+	constructor(roomInfo){
 		this.location = roomInfo.location;
+			// we will use visited to determine if user has already been in this room
+		// room 1 is always initially visited since that is where user starts
+		this.visited = this.location == 1 ? true : false;
+
+		this.doors = [0,0,0,0];
+		this.column = getColumnNumber(this.location);
+		this.row = getRowNumber(this.location);
+		this.textLocationX = (this.column *(gameVars.lineInterval )) - (gameVars.lineInterval /2);
+		this.textLocationY = (this.row * (gameVars.lineInterval )) - (gameVars.lineInterval /2);
+		this.minPoint = new point ((this.column-1) * gameVars.lineInterval, (this.row-1)*gameVars.lineInterval);
+		this.maxPoint = new point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);;
 	}
-	// we will use visited to determine if user has already been in this room
-	// room 1 is always initially visited since that is where user starts
-	this.visited = this.location == 1 ? true : false;
 	
-	this.doors = [0,0,0,0];
-	this.column = getColumnNumber(this.location);
-	this.row = getRowNumber(this.location);
-	this.textLocationX = (this.column *(gameVars.lineInterval )) - (gameVars.lineInterval /2);
-	this.textLocationY = (this.row * (gameVars.lineInterval )) - (gameVars.lineInterval /2);
-	this.minPoint = new point ((this.column-1) * gameVars.lineInterval, (this.row-1)*gameVars.lineInterval);
-	this.maxPoint = new point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);;
 	
-	this.init = function(){
+	
+	init(){
 		this.isPath = false; // it isn't on path until a path is generated
 		this.hasOgre = false;
 		this.isOgreDead = true;
