@@ -1148,7 +1148,7 @@ function mouseUpHandler()
 function getMousePos(evt) {
 	
 	var rect = gameVars.theCanvas.getBoundingClientRect();
-	var currentPoint = new point();
+	var currentPoint = new Point(0,0);
 	currentPoint.x = evt.clientX - rect.left;
 	currentPoint.y = evt.clientY - rect.top;
 	return currentPoint;
@@ -1236,10 +1236,11 @@ class Player{
 	}
 }
 
-function point(x,y)
-{
-	this.x = x;
-	this.y = y;
+class Point{
+	constructor(x,y){
+		this.x = x;
+		this.y = y;
+	}
 }
 
 class Room{
@@ -1254,8 +1255,8 @@ class Room{
 		this.row = getRowNumber(this.location);
 		this.textLocationX = (this.column *(gameVars.lineInterval )) - (gameVars.lineInterval /2);
 		this.textLocationY = (this.row * (gameVars.lineInterval )) - (gameVars.lineInterval /2);
-		this.minPoint = new point ((this.column-1) * gameVars.lineInterval, (this.row-1)*gameVars.lineInterval);
-		this.maxPoint = new point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);;
+		this.minPoint = new Point ((this.column-1) * gameVars.lineInterval, (this.row-1)*gameVars.lineInterval);
+		this.maxPoint = new Point ((this.column) * gameVars.lineInterval, (this.row)*gameVars.lineInterval);;
 	}
 	
 	
