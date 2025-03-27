@@ -585,7 +585,7 @@ function initTokens(iconSize,sizeInBitmap,iconCount,imageIdTag,targetArray){
 				imgSourceY:0*sizeInBitmap,
 				imgSourceSize:sizeInBitmap,
 				imgIdTag:imageIdTag,
-				gridLocation: new gridlocation({x:i*iconSize,y:iconCount*iconSize})
+				gridLocation: new Gridlocation({x:i*iconSize,y:iconCount*iconSize})
 			});
 			targetArray[i].setToken(currentToken);
 	}
@@ -1316,9 +1316,11 @@ class Room{
 	
 }
 
-function gridlocation(value){
-    this.x = value.x;
-    this.y = value.y
+class Gridlocation{
+	constructor(value){
+		this.x = value.x;
+		this.y = value.y
+	}
 }
 
 class Token{
